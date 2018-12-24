@@ -109,9 +109,10 @@ class Events(db.Model):
     end = db.Column('event_time_e', db.Time())
     partnum = db.Column('expected_participants', db.Integer())
     status = db.Column('event_status', db.String())
+    comment = db.column('event_comment', db.String())
     image_file = db.Column('event_img', db.String(), nullable=False)
 
-    def __init__(self, organizer, venue, title, description, tags, date_s, date_e, start, end, partnum, status, image_file ):
+    def __init__(self, organizer, venue, title, description, tags, date_s, date_e, start, end, partnum, status, comment, image_file ):
         self.organizer = organizer
         self.title = title
         self.description = description
@@ -123,6 +124,7 @@ class Events(db.Model):
         self.end = end
         self.partnum = partnum
         self.status = status
+        self.comment = comment
         self.image_file = image_file
 
 

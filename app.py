@@ -1,7 +1,7 @@
 import flask, time, secrets, os
 from PIL import Image
 from flask import request, flash, url_for, redirect, render_template
-from forms import Registration, LogIn, AddVenue, AddEvent
+from forms import Registration, LogIn, AddVenue, AddEvent, EventReg
 from flask_login import login_user , logout_user , current_user , login_required, LoginManager
 from config import app, db
 from Models import Acc, User, Venue, Events, College, Admin_acc
@@ -227,10 +227,11 @@ disps = [
 @app.route("/event/manage", methods=['GET'])
 @login_required
 def event():
+    form = EventReg()
     venues = Venue.query.all()
     events = Events.query.filter_by(status='Pending')
     users = User.query.all()
-    return render_template('events.html', venues=venues, events=events, users=users)
+    return render_template('events.html', form=form, venues=venues, events=events, users=users)
 
 @app.route("/event", methods=['GET'])
 def dispevent():

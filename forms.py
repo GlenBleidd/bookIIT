@@ -109,3 +109,6 @@ class EventReg(FlaskForm):
 							validators=[DataRequired()])
 	userid = IntegerField('User ID',
 							validators=[DataRequired()])
+	comment = TextAreaField('Comments/Suggestions',
+							validators=[DataRequired()])
+	submit = SubmitField('Submit')

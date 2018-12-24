@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/eventstyle.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formsmain.css') }}">    
   </head>
 
   <body>
@@ -54,7 +55,7 @@
                         {% elif event.date_e is not none %}
                         <span class="days">{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
                         {% endif %}
-                        <span class="time">{{ event.start.strftime("%I:%M") }} - {{ event.end.strftime("%I:%M") }}</span>
+                        <span class="time">{{ event.start.strftime("%I:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
                     </time>
                     <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}">
                     <div class="info">
@@ -71,9 +72,7 @@
                             <form action="/event/{{event.id}}/approved" method="post">
                             <button class="approved"><img src="{{ url_for('static', filename='images/approved.png') }}" width="50" height="50"></button>
                             </form>
-                            <form action="/event/{{event.id}}/rejected" method="post">
-                            <button class="rejected"><img src="{{ url_for('static', filename='images/rejected.png') }}" width="50" height="50"></button>
-                            </form>
+                            <button class="rejected" data-toggle="modal" data-target=#modEvent{{ event.id }}><img src="{{ url_for('static', filename='images/rejected.png') }}" width="50" height="50"></button>
                         </ul>
                     </div>
                 </li>
@@ -83,6 +82,47 @@
         </div>
       </div>
     </section>
+
+    {% for event in events %}
+    <div id="modEvent{{event.id}}" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content -->
+        <div class="modal-content">
+          <div class="modal-header">
+            <span class="row">
+                Comments/Suggestion
+            </span>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+          </div>
+          <div class="modal-body">
+                <form class="comment100-form-main validate-form" action="/event/{{event.id}}/rejected" method="post">
+                {{ form.csrf_token }}
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <ul class=flashes>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+              
+            <div class="wrap-input100-2 validate-input">    
+                {{ form.comment(class="comment100", placeholder="Please provide reason for rejection...", rows="6", cols="52") }}
+            </div>
+            <br>
+            <div class="wrap-input100-2 validate-input">
+            {{ form.submit(class="login100-form-btn") }}
+            </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    {%endfor%}
+
 
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
