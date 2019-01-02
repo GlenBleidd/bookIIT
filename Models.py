@@ -104,7 +104,7 @@ class Events(db.Model):
     description = db.Column('event_desc', db.String())
     tags = db.Column('event_tags', db.String())
     date_s = db.Column('event_date', db.Date())
-    date_e = db.Column('event_date2', db.Date())
+    date_e = db.Column('event_date2', db.Date(), nullable=True)
     start = db.Column('event_time_s', db.Time())
     end = db.Column('event_time_e', db.Time())
     partnum = db.Column('expected_participants', db.Integer())

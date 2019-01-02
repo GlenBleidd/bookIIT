@@ -1,7 +1,7 @@
 import flask, time, secrets, os
 from PIL import Image
 from flask import request, flash, url_for, redirect, render_template
-from forms import Registration, LogIn, AddVenue, AddEvent, EventReg
+from forms import Registration, LogIn, AddVenue, AddEvent, EventReg, UpdateUser
 from flask_login import login_user , logout_user , current_user , login_required, LoginManager
 from config import app, db
 from Models import Acc, User, Venue, Events, College, Admin_acc
@@ -51,25 +51,33 @@ def landing():
 def profile():
     # user = User.query.filter_by(id=id).first()
     # acc = Acc.query.filter_by(id=id).first()
-    # form = UpdateUser()
-    # if form.validate_on_submit():
-    #     user.fname = form.fname.data
-    #     user.lname = form.lname.data
-    #     acc.username = form.username.data
-    #     acc.email = form.email.data
-    #     user.contact = form.contact.data
-    #     db.session.commit()
-    #     flash('Your account has been updated!','success')
-    #     return redirect(url_for('profile'))
-    # elif request.method == 'GET':
-    #     form.fname.data = user.fname
-    #     form.lname.data = user.lname
-    #     form.username.data = acc.username
-    #     form.email.data = acc.email
-    #     form.contact.data = user.contact
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     events = Events.query.all()
     return render_template('profile.html', events=events, image_file=image_file)
+
+@app.route("/settings", methods=['GET','POST'])
+@login_required
+def editprofile():
+    user = User.query.filter_by(id=id).first()
+    acc = Acc.query.filter_by(id=id).first()
+    form = UpdateUser()
+    if form.validate_on_submit():
+        user.fname = form.fname.data
+        user.lname = form.lname.data
+        acc.username = form.username.data
+        acc.email = form.email.data
+        user.contact = form.contact.data
+        db.session.commit()
+        flash('Your account has been updated!','success')
+        return redirect(url_for('profile'))
+    elif request.method == 'GET':
+        form.fname.data = user.fname
+        form.lname.data = user.lname
+        form.username.data = acc.username
+        form.email.data = acc.email
+        form.contact.data = user.contact
+    image_file = url_for('static', filename='images/upload/' + current_user.image_file)
+    return render_template('editprofile.html', image_file=image_file)
 
 @app.route("/logout")
 @login_required
@@ -201,7 +209,7 @@ def addevent():
     if form.validate_on_submit():
         if form.image_file.data:
             picture_file = save_picture(form.image_file.data)
-        newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data, tags=form.tags.data, partnum=form.partnum.data, date_s=form.date_s.data, date_e=form.date_e.data, start=form.start.data, end=form.end.data, status='Pending', image_file=picture_file)
+        newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data, tags=form.tags.data, partnum=form.partnum.data, date_s=form.date_s.data, date_e=form.date_e.data, start=form.start.data, end=form.end.data, status='Pending', comment='No Comment', image_file=picture_file)
         db.session.add(newevent)
         db.session.commit()
         flash('Event created. An administrator will approve it later.')

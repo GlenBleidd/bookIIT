@@ -71,7 +71,7 @@
                         {% endif %}
                         <span class="month">{{ event.start.strftime("%H:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
                     </time>
-                    <img alt="alttitle" src="https://farm4.staticflickr.com/3100/2693171833_3545fb852c_q.jpg" />
+                    <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}">
                     <div class="info">
                         <h2 class="title">{{ event.title }}</h2>
                         {% for user in users %}
@@ -81,7 +81,7 @@
                         <p class="desc">{{ event.description }}</p>
                         <ul>
                             <li style="width:50%;"><a href="#website"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </a></li>
-                            <li style="width:50%;"><img src="{{ url_for('static', filename='images/note.png') }}"> More Info </li>
+                            <li style="width:50%;" data-toggle="modal" data-target="#venue{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}"> More Info </li>
                         </ul>
                     </div>
             </ul>    
@@ -94,6 +94,27 @@
         </div>
       </div>
     </section>
+
+{% for event in events %}
+    <!--- LOG IN !--->
+<div id="venue{{ event.id }}" class="modal fade" role="dialog">
+<div class="modal-dialog">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">{{ event.title }}</h4>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      <div class="modal-body">
+              <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" style="width:100%; height:100%;">
+              <p>{{ event.description }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+
 
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
