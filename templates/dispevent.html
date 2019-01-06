@@ -17,7 +17,7 @@
     
     <style> 
     {% for disp in disps %}
-        #{{disp.month}} {background-color: {{disp.color}};}
+    #{{disp.month}} {background-color: {{disp.color}};}
     {% endfor %}
     </style>
 
@@ -53,7 +53,7 @@
       <div class="container" style="padding-top: 50px;">
         <div class="row">
             {% for disp in disps %}
-            <button class="tablink w3-animate-opacity" onclick="openPage('{{ disp.month }}', this, '{{ disp.color }}88')">{{ disp.month }}</button>
+            <button class="tablink w3-animate-opacity" style="background-color: {{ disp.color }};" onclick="openPage('{{ disp.month }}', this, '{{ disp.color }}88')">{{ disp.month }}</button>
             {% endfor %}
             {% for disp in disps %}
             <div id="{{ disp.month }}" class="tabcontent">
@@ -65,9 +65,9 @@
                 <li>
                     <time datetime="2014-07-20">
                         {% if event.date_e is none %}
-                            <span class="day">{{ event.date_s.strftime("%d") }}</span>
+                            <span class="day" style="padding-bottom: 15px;">{{ event.date_s.strftime("%d") }}</span>
                         {% elif event.date_e is not none %}
-                            <span class="days">{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
+                            <span class="days" >{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
                         {% endif %}
                         <span class="month">{{ event.start.strftime("%H:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
                     </time>
@@ -98,7 +98,7 @@
 {% for event in events %}
     <!--- LOG IN !--->
 <div id="venue{{ event.id }}" class="modal fade" role="dialog">
-<div class="modal-dialog">
+<div class="modal-dialog" style="max-width: 75%;">
 
     <!-- Modal content -->
     <div class="modal-content">

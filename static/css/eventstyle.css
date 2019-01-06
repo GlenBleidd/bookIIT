@@ -30,7 +30,7 @@
 	}
 	.event-list > li > time > .day {
 		display: block;
-		font-size: 56pt;
+		font-size: 50pt;
 		font-weight: bold;
 		line-height: 1;
 		padding-top: 10px;
@@ -166,7 +166,7 @@
 			padding: 0px 10px;
 		}
 		.event-list > li > .info > .stat {
-			padding: 0px 650px;
+			padding: 0px 635px;
 		}
 		.event-list > li > .info > ul {
 			position: absolute;
@@ -208,16 +208,15 @@ body, html {
 
 /* Style tab links */
 .tablink {
-  background-color: #fff;
   color: black;
   float: left;
   border: none;
   outline: none;
   cursor: pointer;
-  padding: 10px 11px;
-  font-size: 20px;
-  font-weight: bolder;
-  width: 95px;
+  padding: 5px 6px;
+  font-size: 25px;
+  font-weight: 900;
+  width: 8.33333333%;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
   transition: all 0.35s;

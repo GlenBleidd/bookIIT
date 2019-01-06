@@ -78,12 +78,11 @@
                   </li>
                   <li>
                     <a href="#" target="_blank">
-                    Tasks </a>
+                    Manage Users </a>
                   </li>
                   <li>
                     <a href="#">
-                    <!-- <i class="glyphicon glyphicon-flag"></i> -->
-                    Help </a>
+                    EYOOO </a>
                   </li>
                 </ul>
               </div>
@@ -92,19 +91,20 @@
           </div>
           <div class="col-md-9">
               <div class="profile-content">
+                <div class="row">
                   {%  for event in events %}
                   {% if event.status == 'Approved' %}
-                  <div class="card" style="width: 18rem;">
-                      <img class="card-img-top" src="{{ url_for('static', filename='images/obama.jpg') }}" alt="Card image cap">
+                  <div class="card" style="width: 30%; margin: auto;">
+                      <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
                       <div class="card-body">
                         <p hidden>{{ event.event_id }}</p>
                         <h5 class="card-title">{{ event.title }}</h5>
-{#                        <p class="card-text">{{ event.description }}</p>#}
                         <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.event_id }}">More Info</a>
                       </div>
                   </div>
                   {% endif %}
                   {% endfor %}
+                </div>
               </div>
           </div>
         </div>

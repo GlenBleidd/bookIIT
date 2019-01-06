@@ -42,7 +42,7 @@
     <section class="probootstrap-cover">
       <div class="limiter">
         <div class="container-login100-2">
-          <div class="wrap-venue100">
+          <div class="wrap-venue100" style="margin-top: 60px; margin-bottom: 60px;">
 
             <form class="login100-form validate-form" action="/addvenue" method="POST" enctype="multipart/form-data">
                 {{ form.csrf_token }}
@@ -55,7 +55,7 @@
                         </ul>
                     {% endif %}
                 {% endwith %}
-              <span class="login100-form-title-2">
+              <span class="login100-form-title-2" style="padding-bottom: 10px;">
                 Add Venue
               </span>
 
@@ -114,18 +114,7 @@
                         {% endif %}
               </div>
               </div>
-                <!-- <div class="row">
-                  <span class="txt1">
-                      Add Image
-                  </span>
-                </div>
-
-                <div class="row">
-                  <form action="/venue/add">
-                    <input type="file" class="form-control pb_height-50 reverse" name="pic" accept="image/*">
-                  </form>
-                </div>
- -->
+                
               <div class="container-login100-form-btn">
                 {{ form.submit(class="login100-form-btn")}}
               </div>

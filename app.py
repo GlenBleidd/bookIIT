@@ -244,7 +244,7 @@ def event():
 @app.route("/event", methods=['GET'])
 def dispevent():
     venues = Venue.query.all()
-    events = Events.query.filter_by(status='Pending')
+    events = Events.query.filter_by(status='Approved')
     users = User.query.all()
     return render_template('dispevent.html', venues=venues, events=events, users=users, disps=disps)
 
