@@ -295,7 +295,7 @@ img {
 .card {
   /*margin-top: 50px;*/
   background: #eee;
-  padding: 3em;
+  padding: 1em;
   line-height: 1.5em; }
 
 @media screen and (min-width: 997px) {
@@ -335,7 +335,7 @@ img {
 
 .review-no, .product-description, .vote {
   color: #000; 
-  padding-right: 30px;
+  padding-right: 20px;
   padding-bottom: 15px; }
 
 .product-title {

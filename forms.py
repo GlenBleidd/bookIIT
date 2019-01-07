@@ -82,7 +82,7 @@ class AddVenue(FlaskForm):
 class AddEvent(FlaskForm):
 	title = StringField('Title',
 							validators=[DataRequired()])
-	description = StringField('Description',
+	description = TextAreaField('Description',
 							validators=[DataRequired()])
 	venue = SelectField('Venue',
 							validators=[DataRequired()], choices=[('1', 'Gymnasium'), ('3','ICT 3H'), ('4', 'HUBPORT')])

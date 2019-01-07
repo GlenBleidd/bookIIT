@@ -78,10 +78,10 @@
                         {% if user.id == event.organizer %}
                         <p class="desc">by: {{ user.fname + ' ' + user.lname }}</p>
                         {%endif%}{%endfor%}
-                        <p class="desc">{{ event.description }}</p>
+                        <p class="desc">{{ event.description| truncate(100, False) | safe }}</p>
                         <ul>
                             <li style="width:50%;"><a href="#website"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </a></li>
-                            <li style="width:50%;" data-toggle="modal" data-target="#venue{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
+                            <li style="width:50%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
                         </ul>
                     </div>
             </ul>    
@@ -98,7 +98,7 @@
 {% for event in events %}
 {% for venue in venues %}
     <!--- LOG IN !--->
-<div id="venue{{ event.id }}" class="modal fade" role="dialog">
+<div id="event{{ event.id }}" class="modal fade" role="dialog">
   <div class="modal-dialog" style="max-width: 75%;">
 
     <!-- Modal content -->
@@ -125,11 +125,11 @@
             {% endfor %} -->
             <div class="rating">
               {% if event.date_e is none %}
-              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}">{{ event.date_s  }}</span>  
-              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d, %Y")  }}</span>  
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
               {% elif event.date_e is not none %}
-              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}">{{ event.date_s }} - {{ event.date_e }} </span>
-              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d") }} - {{ event.date_e.strftime("%d, %Y") }} </span>
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
               {% endif %}
             </div>
             <span class="review-no"><img src="{{ url_for('static', filename='images/pin.png') }}">{{ venue.name }}</span>
