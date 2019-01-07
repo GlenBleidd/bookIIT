@@ -1,9 +1,9 @@
 import flask, time
 from flask import request, flash, url_for, redirect, render_template
-from forms import Registration, LogIn,AddVenue, AddEvent, Participate
+from forms import Registration, LogIn,AddVenue, AddEvent, Participate, Results
 from flask_login import login_user , logout_user , current_user , login_required, LoginManager
 from config import app, db
-from Models import User, Venue, Events, College, Admin_acc, Participant, COLLEGENAMES, participant_count
+from Models import User, Venue, Events, College, Admin_acc, Participant, COLLEGENAMES
 import datetime
 from datetime import timedelta
 from time import gmtime, strftime
@@ -36,7 +36,7 @@ def login():
 @app.route("/landing")
 @login_required
 def landing():
-    if current_user.type == 1:
+    if current_user.is_admin:
         return render_template('landing.html')
     else:
         return render_template('profile.html')
@@ -47,6 +47,42 @@ def profile():
     image_file = url_for('static', filename='images/profile_pics/' + current_user.image_file)
     events = Events.query.all()
     return render_template('profile.html', events=events, image_file=image_file)
+
+@app.route("/profile/myevents")
+@login_required
+def myevents():
+    events = Events.query.filter_by(organizer=current_user.id)
+    return render_template('events.html', events=events)
+
+@app.route("/search", methods=['GET', 'POST'])
+@login_required
+def results(search):
+    results = []
+    search_string = search.data['search']
+
+    if search_string:
+        if search.data['select'] == 'Organizer': #if Searching for Organizer name(works with either searching first or last name)
+            qry = db.query(Events, User).filter(User.id==Events.organizer).filter(User.fname.contains(search_string))
+            qry2 = db.query(Events, User).filter(User.id==Events.organizer).filter(User.lname.contains(search_string))
+            qry3= qry.union(qry2)
+            results = [item[0] for item in qry3.all()]
+        elif search.data['select'] == 'Event Title':
+            qry = db.query(Events).filter(Events.title.contains(search_string))
+            results = qry.all()
+        elif search.data['select'] == 'Event Tags':
+            qry = db.query(Events).filter(Events.tags.contains(search_string))
+            results = qry.all()
+        else:
+            qry = db.query(Events)
+            results = qry.all()
+
+        if not results:
+            flash('No results found!')
+            return redirect(url_for('profile'))
+        else:
+            table = Results(results)
+            table.border = True
+            return render_template('results.html', table=table)
 
 @app.route("/venue/manage", methods=['GET'])
 @login_required
@@ -112,13 +148,23 @@ def login2():
         flash ('Invalid email or password.', 'error')
     return render_template('login.html', form=form)
 
+@app.route("/manageusers", methods=['GET','POST'])
+@login_required
+def manageusers():
+    if not current_user.is_admin:
+        flash("You don't have permission to access this page.")
+        return redirect(url_for('profile'))
+    else:
+        userlist = User.query.filter_by(type=0) #this is a user list of Non-Admin Users
+        return render_template('manageusers.html', userlist=userlist)
+
 @app.route("/addvenue", methods=['GET', 'POST'])
 @login_required
 def addvenue():
-    if current_user.type != 1:
+    if not current_user.is_admin:
         flash("You don't have permission to access this page.")
-        return redirect(url_for('venue'))
-    elif current_user.type == 1:
+        return redirect(url_for('profile'))
+    else:
         form = AddVenue()
         if form.validate_on_submit():
             newvenue = Venue(name=form.name.data, college=form.college.data, capacity=form.capacity.data, rate=form.rate.data, equipment=form.equipment.data)
@@ -131,10 +177,10 @@ def addvenue():
 @app.route("/editvenue/<int:id>", methods=['GET', 'POST'])
 @login_required
 def editvenue(id):
-    if current_user.type != 1:
+    if not current_user.is_admin:
         flash("You don't have permission to access this page.")
-        return redirect(url_for('venue'))
-    elif current_user.type == 1:
+        return redirect(url_for('profile'))
+    else:
         venue = Venue.query.filter_by(id=id).first()
         form = AddVenue()
         if form.validate_on_submit():
@@ -151,10 +197,10 @@ def editvenue(id):
 @app.route("/deletevenue/<int:id>", methods=['GET','POST'])
 @login_required
 def deletevenue(id):
-    if current_user.type != 1:
+    if not current_user.is_admin:
         flash("You don't have permission to access this page.")
-        return redirect(url_for('venue'))
-    elif current_user.type == 1:
+        return redirect(url_for('profile'))
+    else:
         venue = Venue.query.filter_by(id=id).first()
         if venue != None:
             db.session.delete(venue)
@@ -178,27 +224,28 @@ def check_availability(start, end):
 @login_required
 def addevent():
     form = AddEvent()
-    datetimenow = datetime.datetime.now()
-    weekfromnow = datetime.datetime.now() - timedelta(days=7)
+    datetimenow = datetime.date.today()
+    weekfromnow = datetime.date.today() - timedelta(days=7)                                                                                                                     
     print form.validate()
-    flash(form.errors)
-    print form.datestart.data
+    flash(form.errors)    
     if form.validate_on_submit():
-        starting = form.start.data+form.datestart.data
-        print starting
-        if (form.datestart.data < datetimenow):
+        print form.venue.data
+        if (form.date_s.data < datetimenow):
             flash('Error. Date or Time start chosen has already passed!')
-        elif(form.datestart.data < weekfromnow):
+        elif(form.date_s.data < weekfromnow):
             flash('Error. You can only book dates from at least one week from today!')
-        elif(check_availability(form.start.data, form.end.data) == False):
+        elif(check_availability(form.date_s.data, form.end.data) == False):
             flash('Venue has been booked for another event at this time.')
         else:
-            newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data, tags=form.tags.data, start=form.start.data, end=form.end.data, status='Pending')
+            if form.date_e.data == None:
+                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_s.data,end=form.end.data, status='Pending')
+            else:
+                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending')
             db.session.add(newevent)
             db.session.commit()
             flash('Event created. An administrator will approve it later.')
             return redirect(url_for('profile'))
-    return render_template('booking.html', form=form)
+    return render_template('book.html', form=form)
 
 disps = [
         { 'month':'Jan', 'color':'#781c2e', 'id':'January'},
@@ -219,7 +266,7 @@ disps = [
 def Autorejecter():
     events = Events.query.all()
     for event in events:
-        if(event.status == 'Pending' and event.start.date() < datetime.date.today()):
+        if(event.status == 'Pending' and event.request < datetime.date.today()):
             event.status = 'Rejected.'
             event.admin_comment = 'Time has already lapsed. Please Rebook or Cancel this request.'
             db.session.commit()
@@ -227,10 +274,10 @@ def Autorejecter():
 @app.route("/event/manage", methods=['GET'])
 @login_required
 def event():
-    if current_user.type != 1:
+    if not current_user.is_admin:
         flash("You don't have permission to access this page.")
         return redirect(url_for('profile'))
-    elif current_user.type == 1:
+    else:
         venues = Venue.query.all()
         Autorejecter()
         events = Events.query.all()
@@ -244,6 +291,26 @@ def dispevent():
     events = Events.query.filter_by(status='Pending')
     users = User.query.all()
     return render_template('dispevent.html', venues=venues, events=events, users=users, disps=disps)
+
+@app.route("/event/<int:id>/participants", methods=['GET'])
+def participantlist():
+    venues = Venue.query.all()
+    events = Events.query.filter_by(status='Approved')
+    participants = Participant.query.all()
+    return render_template('dispevent.html', venues=venues, events=events, participants=participants)
+
+@app.route("/deleteparticipant/<int:id>", methods=['POST'])
+@login_required
+def delparticipant(id):
+    participant = Participant.query.filter_by(id=id)
+    event = Events.query.filter_by(id = participant.event)
+    if current_user.is_admin() or current_user.id == event.organizer:
+        db.session.delete(participant)
+        db.session.commit()
+        return redirect(url_for('dispevent'))
+    else:
+        flash('Error. You have no permission to delete this participant from the event.')
+        return redirect(url_for('dispevent'))
 
 @app.route("/editevent/<int:id>", methods=['GET','POST'])
 @login_required
@@ -278,10 +345,10 @@ def deleteevent(id):
 @app.route("/event/<int:id>/approved", methods=['GET', 'POST'])
 @login_required
 def approveevent(id):
-    if current_user.type != 1:
+    if not current_user.is_admin:
         flash("You don't have permission to access this page.")
         return redirect(url_for('venue'))
-    elif current_user.type == 1:
+    else:
         event = Events.query.filter_by(id=id).first()
         event.status = 'Approved'
         db.session.commit()
@@ -290,10 +357,10 @@ def approveevent(id):
 @app.route("/event/<int:id>/rejected", methods=['POST'])
 @login_required
 def rejectedevent(id):
-    if current_user.type != 1:
+    if not current_user.is_admin:
         flash("You don't have permission to access this page.")
         return redirect(url_for('venue'))
-    elif current_user.type == 1:
+    else:
         event = Events.query.filter_by(id=id).first()
         event.status = 'Rejected'
         db.session.commit()
@@ -303,14 +370,14 @@ def rejectedevent(id):
 @login_required
 def participant_list(id):
     event = Events.query.filter_by(id=id).first()
-    if current_user.id != event.organizer or current_user.type != 1:
+    if current_user.id != event.organizer or not current_user.is_admin:
         flash("You don't have permission to access this page.")
         return redirect(url_for('events'))
     else:
         participants = Participant.query.filter_by(event=id)
         return render_template('events.html') #return render_template('participant_list.html', event=event, participants=participants)
 
-@app.route("/event/<int:id>/invite")
+@app.route("/event/<int:id>/invite", methods=['GET','POST'])
 @login_required
 def invite(id):
     form = Participate()
@@ -325,7 +392,7 @@ def invite(id):
         return redirect(url_for('profile'))
     return render_template('profile.html') #return render_template('invite.html', event=event)
 
-@app.route("/event/<int:id>/participate")
+@app.route("/event/<int:id>/participate", methods=['GET','POST'])
 def participate(id):
     form = Participate()
     event = Events.query.filter_by(id=id).first()
@@ -341,6 +408,13 @@ def participate(id):
         return render_template('profile.html') #return render_template('participate.html', event=event, user=current_user)
     else:
         return render_template('profile.html') #return render_template('participate.html', event=event)
+
+#@app.route("/adminme")
+#def adminme():
+#    user = User.query.filter_by(id=current_user.id)
+#    user.type = 1
+#    db.session.commit()
+#    return redirect('/')
 
 @login_manager.user_loader
 def load_user(acc_id):

@@ -77,6 +77,33 @@ class Admin_acc(db.Model):
         self.college = COLLEGENAMES.get(college)
         self.contact = contact
 
+def default_admins():  #makes default admins.
+    for x in COLLEGEID:
+        test1 = User.query.filter_by(username=COLLEGEID[x]+'_Admin').first()    #test if the college admin account exists.
+        test2 = Admin_acc.query.filter_by(id=test1.id).first()                          #get also admin acc details
+        if test1 == None:   #if the college admin account does not exist(either because it didn't or it was deleted), then create new account.
+            admin = User(username=COLLEGEID[x]+'_Admin',password='1234567890', email='contact@my.iit', fname=COLLEGEID[x], lname='Administrator')
+            admin.type = 1
+            db.session.add(admin)
+            db.session.commit()
+            adminid = User.query.filter_by(username='Admin').first().id
+            admindetails = Admin_acc(id=adminid, faculty_id=x, college=x, contact='+639123456789')
+            db.session.add(admindetails)
+            db.session.commit()
+        else:         #if it exists but is edited, make it into default values
+            test1.username=username=COLLEGEID[x]+'_Admin'
+            test1.password='1234567890'
+            test1.email='contact@my.iit'
+            test1.fname=COLLEGEID[x]
+            test1.lname='Administrator'
+            test2.faculty_id=x
+            test2.college=x
+            test2.contact='+639123456789'
+            db.session.commit()
+
+
+
+
 class Venue(db.Model):
     __tablename__ = "venue"
     id = db.Column('venue_id', db.Integer , primary_key=True)
@@ -118,20 +145,24 @@ class Events(db.Model):
     title = db.Column('event_name', db.String())
     description = db.Column('event_desc', db.String())
     tags = db.Column('event_tags', db.String())
-    start = db.Column('event_datetime_start', db.DateTime())
-    end = db.Column('event_datetime_end', db.DateTime())
+    date_s = db.Column('event_date_start', db.Date())
+    start = db.Column('event_time_start', db.Time())
+    date_e = db.Column('event_date_end', db.Date())
+    end = db.Column('event_time_end', db.Time())
     status = db.Column('event_status', db.String())
     admin_comment = db.Column('admin_comment', db.String())
+    img = db.Column('img', db.String())
 
-    def __init__(self, organizer, venue, title, description, tags, date, start, end, status ):
+    def __init__(self, organizer, venue, title, description, tags, date_s, start, date_e, end, status):
         self.organizer = organizer
         self.title = title
         self.description = description
         self.venue = venue
         self.tags = tags
-        self.date = date
         self.start = start
         self.end = end
+        self.date_s =date_s
+        self.date_e = date_e
         self.status = status
 
     def participant_count(self):

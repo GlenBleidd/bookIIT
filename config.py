@@ -5,8 +5,8 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'testfile'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:regards@localhost:5432/BookIIT'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5432/BookIIT'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:regards@localhost:5432/BookIIT'
+#app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres@localhost:5432/BookIT'
 
 app.static_folder = 'static'
 

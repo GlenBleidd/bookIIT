@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, DateField, TextAreaField, DateTimeField
 from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, InputRequired
 from wtforms_components import TimeField
+from flask_table import Table, Col
 import config, Models
 
 import wtforms_sqlalchemy.fields as f
@@ -50,20 +52,22 @@ class AddEvent(FlaskForm):
 							validators=[DataRequired()])
 	description = StringField('Description',
 							validators=[DataRequired()])
-	venue = QuerySelectField(query_factory=lambda: Models.Venue.query, allow_blank=False)
+	venue = QuerySelectField(query_factory=lambda: Models.Venue.query.all(), allow_blank=False, get_label='name')
 	tags = StringField('Tags',
 							validators=[Optional()])
 	partnum = IntegerField('Participants',
 							validators=[Optional()])
-	datestart = DateField('Start Date',
+	date_s = DateField('Start Date',
 						  validators=[DataRequired()])
 	start = TimeField('Start Time',
 							validators=[DataRequired()])
-	dateend = DateField('End Date',
+	date_e = DateField('End Date',
 						  validators=[DataRequired()])
-	end = DateTimeField('End Time',
+	end = TimeField('End Time',
 							validators=[DataRequired()],)
 	submit = SubmitField('Request Event')
+	image_file = FileField('Event Poster', 
+							validators=[FileAllowed(['jpg', 'png'])])
 
 class Participate(FlaskForm):
 	fname = StringField('First Name',
@@ -74,3 +78,14 @@ class Participate(FlaskForm):
 						validators=[InputRequired(), Email()])
 	contact = StringField('Contact Number',
 						validators=[InputRequired(), Length(min=2, max=20)])
+
+class Results(Table):
+	id = Col('Id', show= False)
+	organizer = Col('Organizer')
+	venue = Col('Venue')
+	title = Col('Title')
+	tags = Col('Tags')
+	date_s = Col('Date Start')
+	time_s = Col('Time Start')
+	date_e = Col('Date End')
+	time_e = Col('Time End')
