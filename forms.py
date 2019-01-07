@@ -39,6 +39,10 @@ class UpdateUser(FlaskForm):
                         validators=[InputRequired(), Email()])
     contact = IntegerField('Contact',
                            validators=[Optional()])
+    password = PasswordField('Password',
+                             validators=[InputRequired(), EqualTo('confirm_password', message='Passwords do not match,')])
+    confirm_password = PasswordField('Confirm Password',
+                                     validators=[InputRequired()])
     submit = SubmitField('Update')
 
     def validate_username(self, username):

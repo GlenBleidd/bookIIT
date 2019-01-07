@@ -50,7 +50,7 @@ class User(db.Model):
         return True
 
     def is_admin(self):
-        return type == 1
+        return self.type == 1
 
     def is_active(self):
         return True
@@ -101,9 +101,6 @@ def default_admins():  #makes default admins.
             test2.contact='+639123456789'
             db.session.commit()
 
-
-
-
 class Venue(db.Model):
     __tablename__ = "venue"
     id = db.Column('venue_id', db.Integer , primary_key=True)
@@ -116,7 +113,7 @@ class Venue(db.Model):
 
     def __init__(self, name, college, capacity, rate, equipment, image_file):
         self.name = name
-        self.college = COLLEGENAMES.get(college)
+        self.college = college
         self.capacity = capacity
         self.rate = rate
         self.equipment = equipment

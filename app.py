@@ -46,7 +46,7 @@ def login():
 @app.route("/landing")
 @login_required
 def landing():
-    if current_user.is_admin:
+    if current_user.is_admin():
         return render_template('landing.html')
     else:
         return render_template('profile.html')
@@ -61,32 +61,19 @@ def profile():
 @app.route("/settings", methods=['GET','POST'])
 @login_required
 def editprofile():
-    user = User.query.filter_by(id=id).first()
-    acc = Acc.query.filter_by(id=id).first()
+    user = User.query.filter_by(id=current_user.id).first()
     form = UpdateUser()
     if form.validate_on_submit():
         user.fname = form.fname.data
         user.lname = form.lname.data
-        acc.username = form.username.data
-        acc.email = form.email.data
+        user.username = form.username.data
+        user.email = form.email.data
         user.contact = form.contact.data
         db.session.commit()
         flash('Your account has been updated!','success')
         return redirect(url_for('profile'))
-    elif request.method == 'GET':
-        form.fname.data = user.fname
-        form.lname.data = user.lname
-        form.username.data = acc.username
-        form.email.data = acc.email
-        form.contact.data = user.contact
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
-    return render_template('editprofile.html', image_file=image_file)
-
-@app.route("/profile/myevents")
-@login_required
-def myevents():
-    events = Events.query.filter_by(organizer=current_user.id)
-    return render_template('events.html', events=events)
+    return render_template('editprofile.html', image_file=image_file, form=form)
 
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
@@ -164,7 +151,7 @@ def login2():
 @app.route("/manageusers", methods=['GET','POST'])
 @login_required
 def manageusers():
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('profile'))
     else:
@@ -196,7 +183,7 @@ def mainvenue():
 @app.route("/addvenue", methods=['GET', 'POST'])
 @login_required
 def addvenue():
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('profile'))
     else:
@@ -215,7 +202,7 @@ def addvenue():
 @app.route("/editvenue/<int:id>", methods=['GET', 'POST'])
 @login_required
 def editvenue(id):
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('profile'))
     else:
@@ -236,12 +223,16 @@ def editvenue(id):
 @app.route("/deletevenue/<int:id>", methods=['GET','POST'])
 @login_required
 def deletevenue(id):
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('profile'))
     else:
         venue = Venue.query.filter_by(id=id).first()
+        events = Events.query.filter_by(venue=venue.id)
         if venue != None:
+            for event in events:
+                db.session.delete(event)
+                db.session.commit()
             db.session.delete(venue)
             db.session.commit()
             flash('Event has been deleted.')
@@ -314,7 +305,7 @@ def Autorejecter():
 @app.route("/event/manage", methods=['GET'])
 @login_required
 def event():
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('profile'))
     else:
@@ -386,7 +377,7 @@ def deleteevent(id):
 @app.route("/event/<int:id>/approved", methods=['GET', 'POST'])
 @login_required
 def approveevent(id):
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('venue'))
     else:
@@ -398,7 +389,7 @@ def approveevent(id):
 @app.route("/event/<int:id>/rejected", methods=['POST'])
 @login_required
 def rejectedevent(id):
-    if not current_user.is_admin:
+    if not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('venue'))
     else:
@@ -411,7 +402,7 @@ def rejectedevent(id):
 @login_required
 def participant_list(id):
     event = Events.query.filter_by(id=id).first()
-    if current_user.id != event.organizer or not current_user.is_admin:
+    if current_user.id != event.organizer or not current_user.is_admin():
         flash("You don't have permission to access this page.")
         return redirect(url_for('events'))
     else:
