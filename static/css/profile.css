@@ -13,6 +13,7 @@ Licensed under MIT
 .profile-sidebar {
   padding: 20px 0 10px 0;
   background: #260007;
+  border-radius: 15px
 }
 
 .profile-userpic img {
@@ -104,8 +105,10 @@ Licensed under MIT
 /* Profile Content */
 .tabcontent {
   padding: 20px;
-  background: #260007;
+  background: #26000788;
+  /*background-color: #fff;*/
   min-height: 460px;
+  border-radius: 15px;
 }
 
 
@@ -217,3 +220,250 @@ a {
     border-top: 1px solid #e7ebee;
     padding: 12px 8px;
 }
+
+/////cards
+
+
+
+.cardd {
+    padding-top: 20px;
+    margin: 10px 0 20px 0;
+    background-color: rgba(214, 224, 226, 0.2);
+    border-top-width: 0;
+    border-bottom-width: 2px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.cardd .cardd-heading {
+    padding: 0 20px;
+    margin: 0;
+}
+
+.cardd .cardd-heading.simple {
+    font-size: 20px;
+    font-weight: 300;
+    color: #777;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.cardd .cardd-heading.image img {
+    display: inline-block;
+    width: 46px;
+    height: 46px;
+    margin-right: 15px;
+    vertical-align: top;
+    border: 0;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+}
+
+.cardd .cardd-heading.image .cardd-heading-header {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.cardd .cardd-heading.image .cardd-heading-header h3 {
+    margin: 0;
+    font-size: 14px;
+    line-height: 16px;
+    color: #262626;
+}
+
+.cardd .cardd-heading.image .cardd-heading-header span {
+    font-size: 12px;
+    color: #999999;
+}
+
+.cardd .cardd-body {
+    padding: 0 20px;
+    margin-top: 20px;
+}
+
+.cardd .cardd-media {
+    padding: 0 20px;
+    margin: 0 -14px;
+}
+
+.cardd .cardd-media img {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.card .cardd-actions {
+    min-height: 30px;
+    padding: 0 20px 20px 20px;
+    margin: 20px 0 0 0;
+}
+
+.cardd .cardd-comments {
+    padding: 20px;
+    margin: 0;
+    background-color: #f8f8f8;
+}
+
+.cardd .cardd-comments .comments-collapse-toggle {
+    padding: 0;
+    margin: 0 20px 12px 20px;
+}
+
+.cardd .cardd-comments .comments-collapse-toggle a,
+.cardd .cardd-comments .comments-collapse-toggle span {
+    padding-right: 5px;
+    overflow: hidden;
+    font-size: 12px;
+    color: #999;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cardd-comments .media-heading {
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.cardd.people {
+    position: relative;
+    display: inline-block;
+    width: 170px;
+    height: 300px;
+    padding-top: 0;
+    margin-left: 20px;
+    overflow: hidden;
+    vertical-align: top;
+}
+
+.cardd.people:first-child {
+    margin-left: 0;
+}
+
+.cardd.people .cardd-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: inline-block;
+    width: 170px;
+    height: 150px;
+    background-color: #ffffff;
+}
+
+.cardd.people .cardd-top.green {
+    background-color: #53a93f;
+}
+
+.cardd.people .cardd-top.blue {
+    background-color: #427fed;
+}
+
+.cardd.people .cardd-info {
+    position: absolute;
+    top: 150px;
+    display: inline-block;
+    width: 100%;
+    height: 101px;
+    overflow: hidden;
+    background: #ffffff;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.cardd.people .cardd-info .title {
+    display: block;
+    margin: 8px 14px 0 14px;
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 18px;
+    color: #404040;
+}
+
+.cardd.people .cardd-info .desc {
+    display: block;
+    margin: 8px 14px 0 14px;
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 16px;
+    color: #737373;
+    text-overflow: ellipsis;
+}
+
+.cardd.people .cardd-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: inline-block;
+    width: 100%;
+    padding: 10px 20px;
+    line-height: 29px;
+    text-align: center;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.cardd.hovercard {
+    position: relative;
+    padding-top: 0;
+    overflow: hidden;
+    text-align: center;
+    background-color: rgba(214, 224, 226, 0.2);
+}
+
+.cardd.hovercard .cardheader {
+    background: url("http://lorempixel.com/850/280/nature/4/");
+    background-size: cover;
+    height: 135px;
+}
+
+.cardd.hovercard .avatar {
+    position: relative;
+    top: -50px;
+    margin-bottom: -50px;
+}
+
+.cardd.hovercard .avatar img {
+    width: 100px;
+    height: 100px;
+    max-width: 100px;
+    max-height: 100px;
+    -webkit-border-radius: 50%;
+    -moz-border-radius: 50%;
+    border-radius: 50%;
+    border: 5px solid rgba(255,255,255,0.5);
+}
+
+.cardd.hovercard .info {
+    padding: 4px 8px 10px;
+}
+
+.cardd.hovercard .info .title {
+    margin-bottom: 4px;
+    font-size: 24px;
+    line-height: 1;
+    color: #262626;
+    vertical-align: middle;
+}
+
+.cardd.hovercard .info .desc {
+    overflow: hidden;
+    font-size: 12px;
+    line-height: 20px;
+    color: #737373;
+    text-overflow: ellipsis;
+}
+
+.cardd.hovercard .bottom {
+    padding: 0 20px;
+    margin-bottom: 17px;
+}
+
+

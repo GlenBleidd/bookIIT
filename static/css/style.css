@@ -337,6 +337,7 @@ h1, h2, h3, h4, h5 {
 
   .card-img-top {
     width: 100%;
+    height: 176.8px;
     border-top-left-radius: calc(.25rem - 1px);
     border-top-right-radius: calc(.25rem - 1px);
   }
