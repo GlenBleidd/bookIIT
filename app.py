@@ -49,11 +49,12 @@ def landing():
 @app.route("/profile", methods=['GET','POST'])
 @login_required
 def profile():
+    form = UpdateUser()
     users = User.query.all()
     accs = Acc.query.all()
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     events = Events.query.all()
-    return render_template('profile.html', accs=accs, events=events, users=users, image_file=image_file)
+    return render_template('profile.html', accs=accs, events=events, users=users, form=form, image_file=image_file)
 
 @app.route("/settings", methods=['GET','POST'])
 @login_required

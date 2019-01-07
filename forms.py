@@ -40,8 +40,14 @@ class UpdateUser(FlaskForm):
 							validators=[InputRequired(), Length(min=5, max=16)])
 	email = StringField('Email',
 							validators=[InputRequired(), Email()])
+	profession = StringField('Profession',
+							validators=[Optional()])
+	bio = TextAreaField('Bio',
+							validators=[Optional()])
 	contact = IntegerField('Contact', 
 							validators=[Optional()])
+	image_file = FileField('Update Picture', 
+							validators=[FileAllowed(['jpg', 'png'])])
 	submit = SubmitField('Update')
 
 	def validate_username(self, username):

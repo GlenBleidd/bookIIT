@@ -66,27 +66,17 @@
               </div>
               <!-- END SIDEBAR BUTTONS -->
               <!-- SIDEBAR MENU -->
-              <!-- <div class="tab">
-                <button class="tablinks" onclick="openCity(event, 'Events')" id="defaultOpen">My Events</button>
-                <button class="tablinks" onclick="openCity(event, 'ManageUsers')">Manage Users</button>
-                <button class="tablinks" onclick="openCity(event, 'Tokyo')">Tokyo</button>
-              </div> -->
-
+              
               <div class="profile-usermenu">
                 <ul>
                   <li>
-                    <a class="tablinks" onclick="openCity(event, 'Events')" id="defaultOpen">My Events</a>
+                    <a class="tablinks" onclick="openCity(event, 'Events')" id="defaultOpen"><img src="{{ url_for('static', filename='images/minicalendar.png')}}">  My Events</a>
                   </li>
                   <li>
-                    <a class="tablinks" onclick="openCity(event, 'ManageUsers')">Manage Users</a>
+                    <a class="tablinks" onclick="openCity(event, 'ManageUsers')"><img src="{{ url_for('static', filename='images/group.png')}}">  Manage Users</a>
                   </li>
                   <li>
-                    <a href="#ManageUsers" rel="ManageUsers">
-                    Account Settings </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                    EYOOO </a>
+                    <a class="tablinks" onclick="openCity(event, 'AccountSettings')"><img src="{{ url_for('static', filename='images/settings.png')}}">  Account Settings</a>
                   </li>
                 </ul>
               </div>
@@ -169,6 +159,69 @@
                             </tbody>
                         </table>
                     </div>
+                </div>
+              </div>
+
+              <div id="AccountSettings" class="tabcontent" style="padding-right: auto;">
+                <div class="row">
+                  <img src="{{ image_file }}" width="123.75px" style="margin-right: 60px; margin-left: 20px;">
+                  <div class="venueform-wrap-2">
+                  {{ form.image_file.label() }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file) }}
+                        {% if form.image_file.errors %}
+                          {% for error in form.image_file.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                    
+
+                  <form class="form-horizontal" role="form" style="width: 100%">
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">First name:</label>
+                      <div class="col-lg-8">
+                        {{ form.fname(class="form-control pb_height-50 reverse" , placeholder="First Name") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Last name:</label>
+                      <div class="col-lg-8">
+                        {{ form.lname(class="form-control pb_height-50 reverse" , placeholder="Last Name") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Email:</label>
+                      <div class="col-lg-8">
+                        {{ form.email(class="form-control pb_height-50 reverse" , placeholder="Email") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Contact:</label>
+                      <div class="col-lg-8">
+                        {{ form.contact(class="form-control pb_height-50 reverse" , placeholder="Contact Number") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Profession:</label>
+                      <div class="col-md-8">
+                        {{ form.profession(class="form-control pb_height-50 reverse" , placeholder="Profession") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">About:</label>
+                      <div class="col-md-8">
+                        {{ form.bio(class="form-control pb_height-50 reverse" , placeholder="Say something about yourself.") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label"></label>
+                      <div class="col-md-8">
+                        <input type="button" class="btn btn-primary" value="Save Changes">
+                        <span></span>
+                        <input type="reset" class="btn btn-default" value="Cancel">
+                      </div>
+                    </div>
+                  </form>
                 </div>
               </div>
 
