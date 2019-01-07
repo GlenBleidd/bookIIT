@@ -68,8 +68,8 @@ class Admin_acc(db.Model):
     __tablename__ = "admin_acc"
     id = db.Column('admin_id', db.Integer)
     faculty_id = db.Column('iit_faculty_id', db.String(), primary_key=True)
-    college = db.Column('college_id', db.Integer)
-    contact = db.Column('contact', db.String())
+    college = db.Column('admin_college', db.Integer)
+    contact = db.Column('admin_contact', db.String())
 
     def __init__(self, id, faculty_id, college, contact):
         self.id = id
@@ -80,25 +80,30 @@ class Admin_acc(db.Model):
 def default_admins():  #makes default admins.
     for x in COLLEGEID:
         test1 = User.query.filter_by(username=COLLEGEID[x]+'_Admin').first()    #test if the college admin account exists.
-        test2 = Admin_acc.query.filter_by(id=test1.id).first()                          #get also admin acc details
         if test1 == None:   #if the college admin account does not exist(either because it didn't or it was deleted), then create new account.
             admin = User(username=COLLEGEID[x]+'_Admin',password='1234567890', email='contact@my.iit', fname=COLLEGEID[x], lname='Administrator')
             admin.type = 1
             db.session.add(admin)
             db.session.commit()
-            adminid = User.query.filter_by(username='Admin').first().id
-            admindetails = Admin_acc(id=adminid, faculty_id=x, college=x, contact='+639123456789')
+            getid = User.query.filter_by(username=COLLEGEID[x]+'_Admin').first().id
+            admindetails = Admin_acc(id=getid, faculty_id=x, college=x, contact='+639123456789')
             db.session.add(admindetails)
             db.session.commit()
         else:         #if it exists but is edited, make it into default values
+            print test1.id
+            test2 = Admin_acc.query.filter_by(id=test1.id).first()                          #get also admin acc details
             test1.username=username=COLLEGEID[x]+'_Admin'
             test1.password='1234567890'
             test1.email='contact@my.iit'
             test1.fname=COLLEGEID[x]
             test1.lname='Administrator'
-            test2.faculty_id=x
-            test2.college=x
-            test2.contact='+639123456789'
+            if test2 != None:
+                test2.faculty_id=x
+                test2.college=x
+                test2.contact='+639123456789'
+            else:
+                admindetails = Admin_acc(id=test1.id, faculty_id=x, college=x, contact='+639123456789')
+                db.session.add(admindetails)
             db.session.commit()
 
 class Venue(db.Model):

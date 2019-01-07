@@ -4,7 +4,7 @@ from flask import request, flash, url_for, redirect, render_template
 from forms import Registration, LogIn, AddVenue, AddEvent, EventReg, UpdateUser, Participate, Results
 from flask_login import login_user , logout_user , current_user , login_required, LoginManager
 from config import app, db
-from Models import User, Venue, Events, College, Admin_acc, Participant, COLLEGENAMES
+from Models import *
 import datetime
 from datetime import timedelta
 from time import gmtime, strftime
@@ -46,6 +46,7 @@ def login():
 @app.route("/landing")
 @login_required
 def landing():
+    print current_user.type
     if current_user.is_admin():
         return render_template('landing.html')
     else:
@@ -269,9 +270,9 @@ def addevent():
             if form.image_file.data:
                 picture_file = save_picture(form.image_file.data)
         if form.date_e.data == None:
-            newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_s.data,end=form.end.data, status='Pending')
+            newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_s.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
         else:
-            newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending')
+            newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
             db.session.add(newevent)
             db.session.commit()
             flash('Event created. An administrator will approve it later.')
@@ -441,12 +442,22 @@ def participate(id):
     else:
         return render_template('profile.html') #return render_template('participate.html', event=event)
 
-#@app.route("/adminme")
-#def adminme():
-#    user = User.query.filter_by(id=current_user.id)
-#    user.type = 1
-#    db.session.commit()
-#    return redirect('/')
+#debugging
+
+@app.route("/toggleadmin")
+def adminme():
+    user = User.query.filter_by(id=current_user.id).first()
+    if user.type == 1:
+        user.type = 0
+    elif user.type == 0:
+        user.type = 1
+    db.session.commit()
+    return redirect('/landing')
+
+@app.route("/makedefaultadmins")
+def makeadmins():
+    default_admins()
+    return redirect('/landing')
 
 @login_manager.user_loader
 def load_user(acc_id):
