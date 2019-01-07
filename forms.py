@@ -2,10 +2,17 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField, IntegerField, SelectField, DateField, TextAreaField, FileField
+from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Optional, InputRequired
-from wtforms_components import TimeField 
-import config
+from wtforms_components import TimeField
+from flask_table import Table, Col
+import config, Models
 
+import wtforms_sqlalchemy.fields as f
+def get_pk_from_identity(obj):
+	cls, key = f.identity_key(instance=obj)[:2]
+	return ':'.join(f.text_type(x) for x in key)
+f.get_pk_from_identity = get_pk_from_identity
 
 class Registration(FlaskForm):
 	fname = StringField('First Name',
@@ -21,40 +28,31 @@ class Registration(FlaskForm):
 	confirm_password = PasswordField('Confirm Password',
 							validators=[InputRequired()])
 
-#def validate_username(self, username):
-	#user = User.query.filter_by(username=username.data).first()
-	#if user:
-		#raise ValidationError('That username already exists! Please use a different one.')
-
-#def validate_email(self, email):
-	#user = User.query.filter_by(email=email.data).first()
-	#if user:
-		#raise ValidationError('That e-mail is already in use! Please use a different one.')
-
 class UpdateUser(FlaskForm):
-	fname = StringField('First Name',
-							validators=[InputRequired(), Length(min=2, max=20)])
-	lname = StringField('Last Name',
-							validators=[InputRequired(), Length(min=2, max=20)])
-	username = StringField('Username',
-							validators=[InputRequired(), Length(min=5, max=16)])
-	email = StringField('Email',
-							validators=[InputRequired(), Email()])
-	contact = IntegerField('Contact', 
-							validators=[Optional()])
-	submit = SubmitField('Update')
+    fname = StringField('First Name',
+                        validators=[InputRequired(), Length(min=2, max=20)])
+    lname = StringField('Last Name',
+                        validators=[InputRequired(), Length(min=2, max=20)])
+    username = StringField('Username',
+                           validators=[InputRequired(), Length(min=5, max=16)])
+    email = StringField('Email',
+                        validators=[InputRequired(), Email()])
+    contact = IntegerField('Contact',
+                           validators=[Optional()])
+    submit = SubmitField('Update')
 
-	def validate_username(self, username):
-		if username.data != current_user.username:
-			user = User.query.filter_by(username=username.data).first()
-			if user:
-				raise ValidationError('Username already exists. Please choose another.')
+    def validate_username(self, username):
+        if username.data != current_user.username:
+            user = User.query.filter_by(username=username.data).first()
+            if user:
+                raise ValidationError('Username already exists. Please choose another.')
 
-	def validate_email(self,email):
-		if email.data != current_user.email:
-			user = User.query.filter_by(username=email.data).first()
-			if user:
-				raise ValidationError('Email already exists. Please choose another.')
+    def validate_email(self,email):
+        if email.data != current_user.email:
+            user = User.query.filter_by(username=email.data).first()
+            if user:
+                raise ValidationError('Email already exists. Please choose another.')
+
 
 class LogIn(FlaskForm):
 	email = StringField('Email',
@@ -74,7 +72,7 @@ class AddVenue(FlaskForm):
 							validators=[Optional()])
 	equipment = TextAreaField('Equipment',
 							validators=[Optional()])
-	image_file = FileField('Update Picture', 
+	image_file = FileField('Update Picture',
 							validators=[FileAllowed(['jpg', 'png'])])
 	submit = SubmitField('Add Venue')
 
@@ -84,21 +82,20 @@ class AddEvent(FlaskForm):
 							validators=[DataRequired()])
 	description = TextAreaField('Description',
 							validators=[DataRequired()])
-	venue = SelectField('Venue',
-							validators=[DataRequired()], choices=[('1', 'Gymnasium'), ('3','ICT 3H'), ('4', 'HUBPORT')])
+	venue = QuerySelectField(query_factory=lambda: Models.Venue.query.all(), allow_blank=False, get_label='name')
 	tags = StringField('Tags',
 							validators=[Optional()])
 	partnum = IntegerField('Participants',
 							validators=[Optional()])
-	date_s = DateField('Date', 
+	date_s = DateField('Start Date',
 							validators=[DataRequired()])
-	date_e = DateField('Date', 
+	date_e = DateField('End Date',
 							validators=[Optional()])
 	start = TimeField('Start Time',
 							validators=[DataRequired()])
 	end = TimeField('End Time',
 							validators=[DataRequired()])
-	image_file = FileField('Event Poster', 
+	image_file = FileField('Event Poster',
 							validators=[FileAllowed(['jpg', 'png'])])
 	submit = SubmitField('Request Event')
 
@@ -112,3 +109,24 @@ class EventReg(FlaskForm):
 	comment = TextAreaField('Comments/Suggestions',
 							validators=[DataRequired()])
 	submit = SubmitField('Submit')
+
+class Participate(FlaskForm):
+    fname = StringField('First Name',
+                        validators=[InputRequired(), Length(min=2, max=20)])
+    lname = StringField('Last Name',
+                        validators=[InputRequired(), Length(min=2, max=20)])
+    email = StringField('Email',
+                        validators=[InputRequired(), Email()])
+    contact = StringField('Contact Number',
+                          validators=[InputRequired(), Length(min=2, max=20)])
+
+class Results(Table):
+    id = Col('Id', show= False)
+    organizer = Col('Organizer')
+    venue = Col('Venue')
+    title = Col('Title')
+    tags = Col('Tags')
+    date_s = Col('Date Start')
+    time_s = Col('Time Start')
+    date_e = Col('Date End')
+    time_e = Col('Time End')
