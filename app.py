@@ -70,16 +70,24 @@ def editprofile():
     user = User.query.filter_by(id=current_user.id).first()
     form = UpdateUser()
     if form.validate_on_submit():
-        user.fname = form.fname.data
-        user.lname = form.lname.data
-        user.username = form.username.data
-        user.email = form.email.data
-        user.contact = form.contact.data
-        db.session.commit()
-        flash('Your account has been updated!','success')
-        return redirect(url_for('profile'))
+        #if username/email is already used
+        if User.query.filter_by(username=form.username.data).first():
+            flash('Username already exists. Please choose another.','error')
+            return redirect(url_for('editprofile'))
+        if User.query.filter_by(email=form.email.data).first():
+            flash('Email already exists. Please choose another.','error')
+            return redirect(url_for('editprofile'))
+        else:
+            user.fname = form.fname.data
+            user.lname = form.lname.data
+            user.username = form.username.data
+            user.email = form.email.data
+            user.contact = form.contact.data
+            db.session.commit()
+            flash('Your account has been updated!','success')
+            return redirect(url_for('profile'))
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
-    return render_template('editprofile.html', image_file=image_file, form=form)
+    return render_template('editprofile.html', image_file=image_file, form=form, user=user)
 
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
@@ -125,7 +133,6 @@ def register():
     else:
         form = Registration()
         if form.validate_on_submit():
-            print form.username.data
             #if username/email is already used
             if User.query.filter_by(username=form.username.data).first():
                 flash('Username already exists. Try a different username.','error')
@@ -249,13 +256,15 @@ def deletevenue(id):
         return redirect(url_for('venue'))
 
 #///////////////////////////// EVENT
-def check_availability(start, end):
-    events = Events.query.all()
+def check_availability(date_s, date_e, start, end, venue): #returns true if available
+    events = Events.query.filter_by(venue=venue) #list all events in a venue
     res = False
-    #check if any approved dates have any overlaps
     for event in events:
         if event.status == 'Approved':
-            overlap = start < event.end and event.start < end
+            if event.date_s == event.date_e and event.date_s == date_s and date_e == 'None':#if event is 1 day, check if any overlapping times.
+                overlap = start < event.end and event.start < end
+            else:
+                overlap = date_s < event.date_e and event.date_s < date_e #if more than 1 day event, check if days intersect
             res = res or overlap
     return not res
 
@@ -271,7 +280,7 @@ def addevent():
             flash('Error. Date or Time start chosen has already passed!','error')
         elif(form.date_s.data < weekfromnow):
             flash('Error. You can only book dates from at least one week from today!','error')
-        elif(check_availability(form.date_s.data, form.end.data) == False):
+        elif not check_availability(form.date_s.data, form.date_e.data, form.start.data, form.end.data, form.venue.data.id): #if not available
             flash('Venue has been booked for another event at this time.','error')
         else:
             if form.image_file.data:
@@ -359,24 +368,33 @@ def editevent(id):
     venue = Venue.query.all()
     image_file = url_for('static', filename='images/upload/' + Events.image_file)
     form = AddEvent() #EditVenue()
+    datetimenow = datetime.date.today()
+    weekfromnow = datetime.date.today() - timedelta(days=7)
     if form.validate_on_submit():
-        if form.image_file.data: #if replacement image exists, replace image. Otherwise, don't edit.
-            picture_file = save_picture(form.image_file.data)
-            event.image_file=picture_file
-        event.description=form.description.data
-        event.name = form.name.data
-        event.date_s=form.date_s.data
-        event.start=form.start.data
-        event.date_e=form.date_e.data
-        event.end=form.end.data
-        event.tags=form.tags.data
-        if event.venue != form.venue.data.id: #if venue was changed, set back to pending.
-            event.venue=form.venue.data.id
-            event.status='Pending'
-            event.comment='Venue has changed. Need approval from administrator.'
-        db.session.commit()
-        flash('Your event details have been changed.','success')
-        return redirect(url_for('events'))
+        if (form.date_s.data < datetimenow):
+            flash('Error. Date or Time start chosen has already passed!','error')
+        elif(form.date_s.data < weekfromnow):
+            flash('Error. You can only book dates from at least one week from today!','error')
+        elif not check_availability(form.date_s.data, form.date_e.data, form.start.data, form.end.data, form.venue.data.id): #if not available
+            flash('Venue has been booked for another event at this time.','error')
+        else:
+            if form.image_file.data: #if replacement image exists, replace image. Otherwise, don't edit.
+                picture_file = save_picture(form.image_file.data)
+                event.image_file=picture_file
+            event.description=form.description.data
+            event.name = form.name.data
+            event.date_s=form.date_s.data
+            event.start=form.start.data
+            event.date_e=form.date_e.data
+            event.end=form.end.data
+            event.tags=form.tags.data
+            if event.venue != form.venue.data.id: #if venue was changed, set back to pending.
+                event.venue=form.venue.data.id
+                event.status='Pending'
+                event.comment='Venue has changed. Need approval from administrator.'
+            db.session.commit()
+            flash('Your event details have been changed.','success')
+            return redirect(url_for('events'))
     return render_template('editevent.html', form=form, event=event, venue=venue, image_file=image_file)
 
 @app.route("/deleteevent/<int:id>", methods=['GET','POST'])
@@ -464,6 +482,43 @@ def participate(id):
     else:
         return render_template('profile.html') #return render_template('participate.html', event=event)
 
+#//////////////////////////ADMIN STUFF: EDIT ADMIN PROFILE
+def init_admin_details(id):
+    admin_details = Admin_acc.query.filter_by(id=id).first()
+    if admin_details == None: #if admin details doesnt exist, initialize. if it does, do nothing
+        user = User.query.filter_by(id=id).first()
+        new_admin = Admin_acc(id=id, faculty_id='Tempidfor_'+user.username, college=0, contact='+639123456789')
+        db.session.add(new_admin)
+        db.session.commit()
+
+@app.route("/settings-admin", methods=['GET','POST'])
+@login_required
+def editadmin():
+    user = User.query.filter_by(id=current_user.id).first()
+    init_admin_details(id=current_user.id)
+    admindetails = Admin_acc.query.filter_by(id=current_user.id).first()
+    form = UpdateUser()
+    if form.validate_on_submit():
+        #if username/email is already used
+        if User.query.filter_by(username=form.username.data).first():
+            flash('Username already exists. Please choose another.','error')
+            return redirect(url_for('editprofile'))
+        if User.query.filter_by(email=form.email.data).first():
+            flash('Email already exists. Please choose another.','error')
+            return redirect(url_for('editprofile'))
+        else:
+            user.fname = form.fname.data
+            user.lname = form.lname.data
+            user.username = form.username.data
+            user.email = form.email.data
+            user.contact = form.contact.data
+            db.session.commit()
+            flash('Your account has been updated!','success')
+            return redirect(url_for('profile'))
+    image_file = url_for('static', filename='images/upload/' + current_user.image_file)
+    return render_template('editprofile.html', image_file=image_file, form=form, user=user)
+
+#(self, id, faculty_id, college, contact):
 #//////////////////////////ADMIN STUFF: MANAGE USERS
 
 @app.route("/manageusers", methods=['GET','POST'])
@@ -486,16 +541,24 @@ def edituser():
         user = User.query.filter_by(id=id).first()
         form = UpdateUser()
         if form.validate_on_submit():
-            user.fname = form.fname.data
-            user.lname = form.lname.data
-            user.username = form.username.data
-            user.email = form.email.data
-            user.contact = form.contact.data
-            db.session.commit()
-            flash('User has been updated!','success')
-            return redirect(url_for('usermanage'))
-        image_file = url_for('static', filename='images/upload/' + current_user.image_file)
-        return render_template('editprofile.html', image_file=image_file, form=form)
+            #if username/email is already used
+            if User.query.filter_by(username=form.username.data).first():
+                flash('Username already exists. Please choose another.','error')
+                return redirect(url_for('editprofile'))
+            if User.query.filter_by(email=form.email.data).first():
+                flash('Email already exists. Please choose another.','error')
+                return redirect(url_for('editprofile'))
+            else:
+                user.fname = form.fname.data
+                user.lname = form.lname.data
+                user.username = form.username.data
+                user.email = form.email.data
+                user.contact = form.contact.data
+                db.session.commit()
+                flash('Your account has been updated!','success')
+                return redirect(url_for('profile'))
+    image_file = url_for('static', filename='images/upload/' + current_user.image_file)
+    return render_template('editprofile.html', image_file=image_file, form=form, user=user)
 
 @app.route("/user/<int:id>/delete", methods=['GET','POST'])
 @login_required
