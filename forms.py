@@ -118,3 +118,13 @@ class EventReg(FlaskForm):
 	comment = TextAreaField('Comments/Suggestions',
 							validators=[DataRequired()])
 	submit = SubmitField('Submit')
+
+class Participate(FlaskForm):
+    fname = StringField('First Name',
+                        validators=[InputRequired(), Length(min=2, max=20)])
+    lname = StringField('Last Name',
+                        validators=[InputRequired(), Length(min=2, max=20)])
+    email = StringField('Email',
+                        validators=[InputRequired(), Email()])
+    contact = StringField('Contact Number',
+                          validators=[InputRequired(), Length(min=2, max=20)])

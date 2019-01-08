@@ -11,7 +11,7 @@ function openPage(pageName, elmnt, color) {
     for (i = 0; i < tablinks.length; i++) {
         tablinks[i].style.backgroundColor = "";
     }
-
+    
     // Show the specific tab content
     document.getElementById(pageName).style.display = "block";
 
