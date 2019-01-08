@@ -27,7 +27,7 @@
           <ul class="navbar-nav ml-auto">
             <!-- <li class="nav-item"><a href="" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li> -->
             <div class="dropdown">
-                <button class="dropbtn"><img src="{{ image_file }}" width="60" height="60"></button>
+                <button class="dropbtn"><img src="{{ url_for('static', filename='images/upload/'+ current_user.image_file )}}" width="60" height="60" style="border-style: none;border-radius: 30px;"></button>
                 <div class="dropdown-content">
                 <a href="#">Profile</a>
                 <a href="/logout">Log Out</a>
@@ -46,7 +46,7 @@
             <div class="profile-sidebar">
               <!-- SIDEBAR USERPIC -->
               <div class="profile-userpic">
-                <img src="{{ image_file }}">
+                <img src="{{ url_for('static', filename='images/upload/'+ current_user.image_file )}}">
               </div>
               <!-- END SIDEBAR USERPIC -->
               <!-- SIDEBAR USER TITLE -->
@@ -63,75 +63,258 @@
               <div class="profile-userbuttons">
                 <!-- <button type="button" class="btn btn-success btn-sm">Create Event</button> -->
                 <a href="/addevent" class="btn btn-success btn-sm">Create Event</a>
+                <br>
+                or
+                <br>
+                <a href="/venue-main" class="btn btn-info btn-sm">Browse Venues</a>
               </div>
               <!-- END SIDEBAR BUTTONS -->
               <!-- SIDEBAR MENU -->
+
               <div class="profile-usermenu">
                 <ul>
                   <li>
-                    <a href="/venue-main">
-                    Venues </a>
+                    <a class="tablinks" onclick="openCity(event, 'Events')" id="defaultOpen"><img src="{{ url_for('static', filename='images/minicalendar.png')}}">  My Events</a>
                   </li>
                   <li>
-                    <a href="/settings">
-                    Account Settings </a>
+                    <a class="tablinks" onclick="openCity(event, 'ManageUsers')"><img src="{{ url_for('static', filename='images/group.png')}}">  Manage Users</a>
                   </li>
                   <li>
-                    <a href="#" target="_blank">
-                    Manage Users </a>
+                    <a class="tablinks" onclick="openCity(event, 'AccountSettings')"><img src="{{ url_for('static', filename='images/settings.png')}}">  Account Settings</a>
                   </li>
                   <li>
-                    <a href="/makedefaultadmins">
-                    EYOOO </a>
+                    <a class="tablinks" onclick="openCity(event, 'About')"><img src="{{ url_for('static', filename='images/about.png')}}">  About</a>
                   </li>
                 </ul>
               </div>
               <!-- END MENU -->
             </div>
           </div>
+
           <div class="col-md-9">
-              <div class="profile-content">
+              <div id="Events" class="tabcontent">
                 <div class="row">
-                  {%  for event in events %}
+                  {%  for event in events | sort(attribute='date_s') %}
+                  {% if event.organizer == current_user.id %}
                   {% if event.status == 'Approved' %}
-                  <div class="card" style="width: 30%; margin: auto;">
+                  <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
                       <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
-                      <div class="card-body">
+                      <div class="card-body" style="background-color: #b2f977">
                         <p hidden>{{ event.event_id }}</p>
                         <h5 class="card-title">{{ event.title }}</h5>
-                        <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.event_id }}">More Info</a>
+                        <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
                       </div>
                   </div>
+                  {% elif event.status == 'Rejected' %}
+                  <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                      <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                      <div class="card-body" style="background-color: #f97f66">
+                        <p hidden>{{ event.event_id }}</p>
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                      </div>
+                  </div>
+                  {% elif event.status == 'Pending' %}
+                  <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                      <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                      <div class="card-body" style="background-color: #777777">
+                        <p hidden>{{ event.event_id }}</p>
+                        <h5 class="card-title">{{ event.title }}</h5>
+                        <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                      </div>
+                  </div>
+                  {% endif %}
                   {% endif %}
                   {% endfor %}
                 </div>
               </div>
+
+              <div id="ManageUsers" class="tabcontent">
+                <div class="row">
+                  <div class="table-responsive">
+                        <table class="table user-list">
+                            <thead>
+                                <tr>
+                                <th><span>User</span></th>
+                                <th><span>Email</span></th>
+                                <th><span>Action</span></th>
+                                <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              {% for user in users %}
+                              {% for acc in accs %}
+                              {% if acc.id == user.id %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ url_for('static', filename='images/upload/'+ acc.image_file )}}">
+                                        <a href="#" class="user-link">{{ user.fname + ' ' + user.lname }}</a>
+                                        <span class="user-subhead">{{ acc.username }}</span>
+                                    </td>
+
+                                    <td>
+                                        <a href="#">{{ acc.email }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="#"><img src="{{ url_for('static', filename='images/deleteuser.png')}}"> Delete</a>
+                                    </td>
+                                </tr>
+                              {% endif %}
+                              {% endfor %}
+                              {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+              </div>
+
+              <div id="AccountSettings" class="tabcontent" style="padding-right: auto;">
+                <div class="row">
+                  <img src="{{ image_file }}" width="123.75px" style="margin-right: 60px; margin-left: 20px;">
+                  <div class="venueform-wrap-2">
+                  {{ form.image_file.label() }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file) }}
+                        {% if form.image_file.errors %}
+                          {% for error in form.image_file.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+
+
+                  <form class="form-horizontal" role="form" style="width: 100%">
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">First name:</label>
+                      <div class="col-lg-8">
+                        {{ form.fname(class="form-control pb_height-50 reverse" , placeholder="First Name") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Last name:</label>
+                      <div class="col-lg-8">
+                        {{ form.lname(class="form-control pb_height-50 reverse" , placeholder="Last Name") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Email:</label>
+                      <div class="col-lg-8">
+                        {{ form.email(class="form-control pb_height-50 reverse" , placeholder="Email") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Contact:</label>
+                      <div class="col-lg-8">
+                        {{ form.contact(class="form-control pb_height-50 reverse" , placeholder="Contact Number") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Profession:</label>
+                      <div class="col-md-8">
+                        {{ form.profession(class="form-control pb_height-50 reverse" , placeholder="Profession") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">About:</label>
+                      <div class="col-md-8">
+                        {{ form.bio(class="form-control pb_height-50 reverse" , placeholder="Say something about yourself.") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label"></label>
+                      <div class="col-md-8">
+                        <input type="button" class="btn btn-primary" value="Save Changes">
+                        <span></span>
+                        <input type="reset" class="btn btn-default" value="Cancel">
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div id="About" class="tabcontent" style="padding-right: auto;">
+                <div class="row">
+                  {% for user in users %}
+                  {% for acc in accs %}
+                  {% if acc.id == user.id %}
+                  <div class="col-lg-3 col-sm-6" style="max-width: 33%;">
+
+                    <div class="cardd hovercard" style="height: 350px;">
+                        <div class="cardheader">
+
+                        </div>
+                        <div class="avatar">
+                            <img src="{{ url_for('static', filename='images/upload/'+ acc.image_file )}}">
+                        </div>
+                        <div class="info">
+                            <div class="title">
+                                <a target="_blank" href="https://scripteden.com/">{{user.fname + ' ' + user.lname}}</a>
+                            </div>
+                            <div class="desc">college</div>
+                            <div class="desc">{{ acc.email }}</div>
+                            <div class="desc">cellphon#</div>
+                            <div class="desc">telephone#</div>
+                        </div>
+
+                        <!-- <div class="bottom">
+                            <a class="btn btn-primary btn-twitter btn-sm" href="https://twitter.com/webmaniac">
+                                <i class="fa fa-twitter"></i>
+                            </a>
+                            <a class="btn btn-danger btn-sm" rel="publisher"
+                               href="https://plus.google.com/+ahmshahnuralam">
+                                <i class="fa fa-google-plus"></i>
+                            </a>
+                            <a class="btn btn-primary btn-sm" rel="publisher"
+                               href="https://plus.google.com/shahnuralam">
+                                <i class="fa fa-facebook"></i>
+                            </a>
+                            <a class="btn btn-warning btn-sm" rel="publisher" href="https://plus.google.com/shahnuralam">
+                                <i class="fa fa-behance"></i>
+                            </a>
+                        </div> -->
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% endfor %}
+                  {% endfor %}
+
+
+
+                </div>
+              </div>
+
           </div>
         </div>
       </div>
     </section>
 
     {% for event in events %}
-        <div id="event{{ event.event_id }}" class="modal fade" role="dialog">
-            <div class="modal-dialog"1>
+        <div id="event{{ event.id }}" class="modal fade" role="dialog">
+            <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">{{ event.title }}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
                   </div>
                   <div class="modal-body2">
+                    <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" style="max-width: 100%">
                     <p>{{ event.description }}</p>
                     <p>{{ event.date_s.strftime("%d-%B-%Y") }}</p>
                     <p>{{ event.start.strftime("%I:%M %p") }} - {{ event.end.strftime("%I:%M %p") }}</p>
 
+                    {% if event.status == 'Rejected' %}
+                    <p>{{ event.comment }}</p>
+                    {% endif %}
+
                   </div>
                   <div class="modal-footer">
-                    <button type="button" class="btn2 btn2-default" data-dismiss="modal">Close</button>
+                    <button type="button" href="/venue" class="btn2 btn2-default" style="background-color: #00ff00">Edit</button>
+                    <button type="button" href="/venue" class="btn2 btn2-default" style="background-color: #ff0000">Delete</button>
                   </div>
                 </div>
             </div>
         </div>
     {% endfor %}
+
 
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>

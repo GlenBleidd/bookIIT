@@ -29,21 +29,23 @@ class Registration(FlaskForm):
 							validators=[InputRequired()])
 
 class UpdateUser(FlaskForm):
-    fname = StringField('First Name',
-                        validators=[InputRequired(), Length(min=2, max=20)])
-    lname = StringField('Last Name',
-                        validators=[InputRequired(), Length(min=2, max=20)])
-    username = StringField('Username',
-                           validators=[InputRequired(), Length(min=5, max=16)])
-    email = StringField('Email',
-                        validators=[InputRequired(), Email()])
-    contact = IntegerField('Contact',
-                           validators=[Optional()])
-    password = PasswordField('Password',
-                             validators=[InputRequired(), EqualTo('confirm_password', message='Passwords do not match,')])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[InputRequired()])
-    submit = SubmitField('Update')
+	fname = StringField('First Name',
+							validators=[InputRequired(), Length(min=2, max=20)])
+	lname = StringField('Last Name',
+							validators=[InputRequired(), Length(min=2, max=20)])
+	username = StringField('Username',
+							validators=[InputRequired(), Length(min=5, max=16)])
+	email = StringField('Email',
+							validators=[InputRequired(), Email()])
+	profession = StringField('Profession',
+							validators=[Optional()])
+	bio = TextAreaField('Bio',
+							validators=[Optional()])
+	contact = IntegerField('Contact',
+							validators=[Optional()])
+	image_file = FileField('Update Picture',
+							validators=[FileAllowed(['jpg', 'png'])])
+	submit = SubmitField('Update')
 
     def validate_username(self, username):
         if username.data != current_user.username:

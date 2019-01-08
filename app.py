@@ -56,9 +56,12 @@ def landing():
 @app.route("/profile", methods=['GET','POST'])
 @login_required
 def profile():
-    image_file = url_for('static', filename='images/profile_pics/' + current_user.image_file)
+    form = UpdateUser()
+    users = User.query.all()
+    accs = Acc.query.all()
+    image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     events = Events.query.all()
-    return render_template('profile.html', events=events, image_file=image_file)
+    return render_template('profile.html', accs=accs, events=events, users=users, form=form, image_file=image_file)
 
 @app.route("/settings", methods=['GET','POST'])
 @login_required
@@ -168,7 +171,7 @@ def venue():
     colleges = College.query.all()
     return render_template('venue.html', venues=venues, colleges=colleges)
 
-@app.route("/venue/", methods=['GET'])
+@app.route("/venue", methods=['GET'])
 @login_required
 def dispvenue():
     venues = Venue.query.all()
@@ -321,10 +324,11 @@ def event():
 @app.route("/event", methods=['GET'])
 def dispevent():
     venues = Venue.query.all()
+    form = Participate()
     Autorejecter()
     events = Events.query.filter_by(status='Approved')
     users = User.query.all()
-    return render_template('dispevent.html', venues=venues, events=events, users=users, disps=disps)
+    return render_template('dispevent.html', venues=venues, events=events, users=users, form=form, disps=disps)
 
 @app.route("/event/<int:id>/participants", methods=['GET'])
 def participantlist():
