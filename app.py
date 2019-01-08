@@ -25,6 +25,7 @@ def save_picture(form_picture):
 
     return picture_fn
 
+#//////////////////////////USER COMMON ROUTES
 @app.route("/")
 
 @app.route("/index", methods=['GET','POST'])
@@ -38,7 +39,7 @@ def login():
             if user.password == form.password.data:
                 #If email exists and pass is correct, login.
                 login_user(user)
-                flash('Logged in successfully.')
+                flash('Logged in successfully.', 'login')
                 return redirect(url_for('landing'))
         flash ('Invalid email or password.', 'error')
     return render_template('index.html', form=form)
@@ -50,7 +51,7 @@ def landing():
     if current_user.is_admin():
         return render_template('landing.html')
     else:
-        return render_template('profile.html')
+        return redirect('/profile')
 
 @app.route("/profile", methods=['GET','POST'])
 @login_required
@@ -99,7 +100,7 @@ def results(search):
             results = qry.all()
 
         if not results:
-            flash('No results found!')
+            flash('No results found!', 'search')
             return redirect(url_for('profile'))
         else:
             table = Results(results)
@@ -109,7 +110,7 @@ def results(search):
 @app.route("/logout")
 @login_required
 def logout():
-    flash('You have logged out!')
+    flash('You have logged out!','logout')
     logout_user()
     return redirect(url_for('login'))
 
@@ -120,16 +121,16 @@ def register():
         print form.username.data
         #if username/email is already used
         if User.query.filter_by(username=form.username.data).first():
-            flash('Username already exists. Try a different username.')
+            flash('Username already exists. Try a different username.','error')
             return redirect(url_for('register'))
         if User.query.filter_by(email=form.email.data).first():
-            flash('Email already used. Use a different email address.')
+            flash('Email already used. Use a different email address.','error')
             return redirect(url_for('register'))
         #if user,email does not exist yet, and passwords match, register.
         newacc = User(username=form.username.data, password=form.password.data, email=form.email.data, fname=form.fname.data, lname=form.lname.data)
         db.session.add(newacc)
         db.session.commit()
-        flash('Account created!')
+        flash('Account created!','success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
@@ -144,7 +145,7 @@ def login2():
             if user.password == form.password.data:
                 #If email exists and pass is correct, login.
                 login_user(user)
-                flash('Logged in successfully.')
+                flash('Logged in successfully.','login')
                 return redirect(url_for('landing'))
         flash ('Invalid email or password.', 'error')
     return render_template('login.html', form=form)
@@ -153,7 +154,7 @@ def login2():
 @login_required
 def manageusers():
     if not current_user.is_admin():
-        flash("You don't have permission to access this page.")
+        flash("You don't have permission to access this page.",'error')
         return redirect(url_for('profile'))
     else:
         userlist = User.query.filter_by(type=0) #this is a user list of Non-Admin Users
@@ -167,7 +168,7 @@ def venue():
     colleges = College.query.all()
     return render_template('venue.html', venues=venues, colleges=colleges)
 
-@app.route("/venue", methods=['GET'])
+@app.route("/venue/", methods=['GET'])
 @login_required
 def dispvenue():
     venues = Venue.query.all()
@@ -185,7 +186,7 @@ def mainvenue():
 @login_required
 def addvenue():
     if not current_user.is_admin():
-        flash("You don't have permission to access this page.")
+        flash("You don't have permission to access this page.",'error')
         return redirect(url_for('profile'))
     else:
         image_file = url_for('static', filename='images/upload/' + Venue.image_file)
@@ -196,7 +197,7 @@ def addvenue():
             newvenue = Venue(name=form.name.data, college=form.college.data, capacity=form.capacity.data, rate=form.rate.data, equipment=form.equipment.data, image_file=picture_file)
             db.session.add(newvenue)
             db.session.commit()
-            flash('Venue created.')
+            flash('Venue created.','success')
             return redirect(url_for('venue'))
         return render_template('addvenue.html', form=form, image_file=image_file)
 
@@ -204,7 +205,7 @@ def addvenue():
 @login_required
 def editvenue(id):
     if not current_user.is_admin():
-        flash("You don't have permission to access this page.")
+        flash("You don't have permission to access this page.",'error')
         return redirect(url_for('profile'))
     else:
         venue = Venue.query.filter_by(id=id).first()
@@ -217,7 +218,7 @@ def editvenue(id):
             venue.rate = form.rate.data
             venue.equipment = form.equipment.data
             db.session.commit()
-            flash('Venue created.')
+            flash('Venue created.','success')
             return redirect(url_for('venue'))
         return render_template('editvenue.html', form=form, venue=venue, image_file=image_file)
 
@@ -225,18 +226,19 @@ def editvenue(id):
 @login_required
 def deletevenue(id):
     if not current_user.is_admin():
-        flash("You don't have permission to access this page.")
+        flash("You don't have permission to access this page.",'error')
         return redirect(url_for('profile'))
     else:
         venue = Venue.query.filter_by(id=id).first()
         events = Events.query.filter_by(venue=venue.id)
         if venue != None:
             for event in events:
+                flash('NOTICE: An event has been removed because the venue of the event has become unavailable.','Notify'+event.organizer)
                 db.session.delete(event)
                 db.session.commit()
             db.session.delete(venue)
             db.session.commit()
-            flash('Event has been deleted.')
+            flash('Event has been deleted.','success')
         else:
             flash('No such event exists!')
         return redirect(url_for('venue'))
@@ -261,11 +263,11 @@ def addevent():
     weekfromnow = datetime.date.today() - timedelta(days=7)
     if form.validate_on_submit():
         if (form.date_s.data < datetimenow):
-            flash('Error. Date or Time start chosen has already passed!')
+            flash('Error. Date or Time start chosen has already passed!','error')
         elif(form.date_s.data < weekfromnow):
-            flash('Error. You can only book dates from at least one week from today!')
+            flash('Error. You can only book dates from at least one week from today!','error')
         elif(check_availability(form.date_s.data, form.end.data) == False):
-            flash('Venue has been booked for another event at this time.')
+            flash('Venue has been booked for another event at this time.','error')
         else:
             if form.image_file.data:
                 picture_file = save_picture(form.image_file.data)
@@ -275,7 +277,7 @@ def addevent():
             newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
             db.session.add(newevent)
             db.session.commit()
-            flash('Event created. An administrator will approve it later.')
+            flash('Event created. An administrator will approve it later.','success')
             return redirect(url_for('profile'))
     return render_template('book.html', form=form, image_file=image_file)
 
@@ -300,14 +302,14 @@ def Autorejecter():
     for event in events:
         if(event.status == 'Pending' and event.request < datetime.date.today()):
             event.status = 'Rejected.'
-            event.admin_comment = 'Time has already lapsed. Please Rebook or Cancel this request.'
+            event.comment = 'Time has already lapsed. Please Rebook or Cancel this request.'
             db.session.commit()
 
 @app.route("/event/manage", methods=['GET'])
 @login_required
 def event():
     if not current_user.is_admin():
-        flash("You don't have permission to access this page.")
+        flash("You don't have permission to access this page.",'error')
         return redirect(url_for('profile'))
     else:
         form = EventReg()
@@ -341,7 +343,7 @@ def delparticipant(id):
         db.session.commit()
         return redirect(url_for('dispevent'))
     else:
-        flash('Error. You have no permission to delete this participant from the event.')
+        flash('Error. You have no permission to delete this participant from the event.','error')
         return redirect(url_for('dispevent'))
 
 @app.route("/editevent/<int:id>", methods=['GET','POST'])
@@ -349,17 +351,25 @@ def delparticipant(id):
 def editevent(id):
     event = Events.query.filter_by(id=id).first()
     venue = Venue.query.all()
-    image_file = url_for('static', filename='images/upload/' + Event.image_file)
+    image_file = url_for('static', filename='images/upload/' + Events.image_file)
     form = AddVenue() #EditVenue()
     if form.validate_on_submit():
-        event.organizer = current_user.id
+        if form.image_file.data: #if replacement image exists, replace image. Otherwise, don't edit.
+            picture_file = save_picture(form.image_file.data)
+            event.image_file=picture_file
+        event.description=form.description.data
         event.name = form.name.data
-        event.date=form.date.data
-        event.time=form.time.data
+        event.date_s=form.date_s.data
+        event.start=form.start.data
+        event.date_e=form.date_e.data
+        event.end=form.end.data
         event.tags=form.tags.data
-        event.venue=form.venue.data
-        event.participantnum=form.participantnum.data
+        if event.venue != form.venue.data.id: #if venue was changed, set back to pending.
+            event.venue=form.venue.data.id
+            event.status='Pending'
+            event.comment='Venue has changed. Need approval from administrator.'
         db.session.commit()
+        flash('Your event details have been changed.','success')
         return redirect(url_for('events'))
     return render_template('editevent.html', form=form, event=event, venue=venue, image_file=image_file)
 
@@ -368,35 +378,41 @@ def editevent(id):
 def deleteevent(id):
     event = Events.query.filter_by(id=id).first()
     if event != None:
+        participants = Participant.query.filter_by(event=event.id)
+        for participant in participants:
+            db.session.delete(participant)
+            db.session.commit()
         db.session.delete(event)
         db.session.commit()
-        flash('Event has been deleted.')
+        flash('Event has been deleted.','success')
     else:
-        flash('No such event exists!')
+        flash('No such event exists!','error')
     return redirect(url_for('events'))
 
 @app.route("/event/<int:id>/approved", methods=['GET', 'POST'])
 @login_required
 def approveevent(id):
     if not current_user.is_admin():
-        flash("You don't have permission to access this page.")
-        return redirect(url_for('venue'))
+        flash("You don't have permission to access this page.",'error')
+        return redirect(url_for('profile'))
     else:
         event = Events.query.filter_by(id=id).first()
         event.status = 'Approved'
         db.session.commit()
+        flash('Your event has been approved!','Notify'+event.organizer)
         return redirect(url_for('profile'))
 
 @app.route("/event/<int:id>/rejected", methods=['POST'])
 @login_required
 def rejectedevent(id):
     if not current_user.is_admin():
-        flash("You don't have permission to access this page.")
+        flash("You don't have permission to access this page.",'error')
         return redirect(url_for('venue'))
     else:
         event = Events.query.filter_by(id=id).first()
         event.status = 'Rejected'
         db.session.commit()
+        flash('Your event has been rejected! Please review it as soon as possible.','Notify'+event.organizer)
         return redirect(url_for('profile'))
 
 @app.route("/event/<int:id>/participants", methods=['GET','POST'])
@@ -404,7 +420,7 @@ def rejectedevent(id):
 def participant_list(id):
     event = Events.query.filter_by(id=id).first()
     if current_user.id != event.organizer or not current_user.is_admin():
-        flash("You don't have permission to access this page.")
+        flash("You don't have permission to access this page.",'error')
         return redirect(url_for('events'))
     else:
         participants = Participant.query.filter_by(event=id)
@@ -416,12 +432,12 @@ def invite(id):
     form = Participate()
     event = Events.query.filter_by(id=id).first()
     if event.status != 'Approved' or event == None:
-        flash('No such event booked or approved.')
+        flash('No such event booked or approved.','error')
     else:
         newparticipant = Participant(event=id, fname=form.fname.data, lname=form.lname.data, email=form.email.data, contact=form.contact.data)
         db.session.add(newparticipant)
         db.session.commit()
-        flash('Person invited to event.')
+        flash('Person invited to event.','success')
         return redirect(url_for('profile'))
     return render_template('profile.html') #return render_template('invite.html', event=event)
 
@@ -430,23 +446,29 @@ def participate(id):
     form = Participate()
     event = Events.query.filter_by(id=id).first()
     if event.status != 'Approved' or event == None:
-        flash('No such event booked or approved.')
+        flash('No such event booked or approved.','error')
     else:
         newparticipant = Participant(event=id, fname=form.fname.data, lname=form.lname.data, email=form.email.data, contact=form.contact.data)
         db.session.add(newparticipant)
         db.session.commit()
-        flash('Participant added.')
+        flash('Participant added.','success')
         return redirect(url_for('profile'))
     if current_user != None:
         return render_template('profile.html') #return render_template('participate.html', event=event, user=current_user)
     else:
         return render_template('profile.html') #return render_template('participate.html', event=event)
 
-#debugging
+#//////////////////////////ADMIN STUFF
 
-@app.route("/toggleadmin")
+
+#//////////////////////////SV_CHEATS 1
+#The debugging routes.
+
+@app.route("/toggleadmin") #toggles current_user's is_admin status
 def adminme():
     user = User.query.filter_by(id=current_user.id).first()
+    if user == None:
+        return redirect('/login')
     if user.type == 1:
         user.type = 0
     elif user.type == 0:
@@ -454,7 +476,7 @@ def adminme():
     db.session.commit()
     return redirect('/landing')
 
-@app.route("/makedefaultadmins")
+@app.route("/makedefaultadmins")#creates all the default admins.
 def makeadmins():
     default_admins()
     return redirect('/landing')

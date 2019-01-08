@@ -17,7 +17,7 @@ COLLEGENAMES = {
 COLLEGEID = {
     1: 'MSU-IIT',
     2: 'COE',
-    3: 'CSM:',
+    3: 'CSM',
     4: 'CED',
     5: 'CASS',
     6: 'CBAA',
