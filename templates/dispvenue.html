@@ -42,6 +42,9 @@
 
     <section class="probootstrap-section">
       <div class="container">
+        <div>
+        <a href="/venue/manage"><img src="{{ url_for('static', filename='images/back.png') }}" width="100px"></a>  
+        </div> 
         <div class="row align-items-center">
           <div class="col-md pl-md-3 pl-0 probootstrap-image-grid">
             {% with messages = get_flashed_messages() %}
@@ -53,7 +56,7 @@
                     </ul>
                 {% endif %}
             {% endwith %}
-            <div class="row">
+            <div class="row" style="padding-top: 10px;">
 
               {% for venue in venues %}
               <div class="col-md-4 col-sm-6" style="padding-top: 5px; padding-bottom: 15px;  ">
@@ -75,6 +78,8 @@
         </div>
       </div>
     </section>
+
+
 
     <footer>
      <div class="container-fluid bg-primary py-3">
