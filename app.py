@@ -30,24 +30,26 @@ def save_picture(form_picture):
 
 @app.route("/index", methods=['GET','POST'])
 def login():
-    form = LogIn(request.form)
-    if form.validate_on_submit():
-        #Does email exist in db?
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            #Is pass correct?
-            if user.password == form.password.data:
-                #If email exists and pass is correct, login.
-                login_user(user)
-                flash('Logged in successfully.', 'login')
-                return redirect(url_for('landing'))
-        flash ('Invalid email or password.', 'error')
-    return render_template('index.html', form=form)
+    if current_user.is_authenticated:
+        return redirect('/landing')
+    else:
+        form = LogIn(request.form)
+        if form.validate_on_submit():
+            #Does email exist in db?
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                #Is pass correct?
+                if user.password == form.password.data:
+                    #If email exists and pass is correct, login.
+                    login_user(user)
+                    flash('Logged in successfully.', 'login')
+                    return redirect(url_for('landing'))
+            flash ('Invalid email or password.', 'error')
+        return render_template('index.html', form=form)
 
 @app.route("/landing")
 @login_required
 def landing():
-    print current_user.type
     if current_user.is_admin():
         return render_template('landing.html')
     else:
@@ -58,10 +60,9 @@ def landing():
 def profile():
     form = UpdateUser()
     users = User.query.all()
-    accs = Acc.query.all()
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     events = Events.query.all()
-    return render_template('profile.html', accs=accs, events=events, users=users, form=form, image_file=image_file)
+    return render_template('profile.html', events=events, users=users, form=form, image_file=image_file)
 
 @app.route("/settings", methods=['GET','POST'])
 @login_required
@@ -119,49 +120,47 @@ def logout():
 
 @app.route("/register", methods=['GET','POST'])
 def register():
-    form = Registration()
-    if form.validate_on_submit():
-        print form.username.data
-        #if username/email is already used
-        if User.query.filter_by(username=form.username.data).first():
-            flash('Username already exists. Try a different username.','error')
-            return redirect(url_for('register'))
-        if User.query.filter_by(email=form.email.data).first():
-            flash('Email already used. Use a different email address.','error')
-            return redirect(url_for('register'))
-        #if user,email does not exist yet, and passwords match, register.
-        newacc = User(username=form.username.data, password=form.password.data, email=form.email.data, fname=form.fname.data, lname=form.lname.data)
-        db.session.add(newacc)
-        db.session.commit()
-        flash('Account created!','success')
-        return redirect(url_for('login'))
-    return render_template('register.html', form=form)
+    if current_user.is_authenticated:
+        return redirect('/landing')
+    else:
+        form = Registration()
+        if form.validate_on_submit():
+            print form.username.data
+            #if username/email is already used
+            if User.query.filter_by(username=form.username.data).first():
+                flash('Username already exists. Try a different username.','error')
+                return redirect(url_for('register'))
+            if User.query.filter_by(email=form.email.data).first():
+                flash('Email already used. Use a different email address.','error')
+                return redirect(url_for('register'))
+            #if user,email does not exist yet, and passwords match, register.
+            newacc = User(username=form.username.data, password=form.password.data, email=form.email.data, fname=form.fname.data, lname=form.lname.data)
+            db.session.add(newacc)
+            db.session.commit()
+            flash('Account has been created! You have now logged in!','success')
+            getuser = User.query.filter_by(username=newacc.username).first()
+            login_user(getuser)
+            return redirect(url_for('login'))
+        return render_template('register.html', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login2():
-    form = LogIn(request.form)
-    if form.validate_on_submit():
-        #Does email exist in db?
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            #Is pass correct?
-            if user.password == form.password.data:
-                #If email exists and pass is correct, login.
-                login_user(user)
-                flash('Logged in successfully.','login')
-                return redirect(url_for('landing'))
-        flash ('Invalid email or password.', 'error')
-    return render_template('login.html', form=form)
-
-@app.route("/manageusers", methods=['GET','POST'])
-@login_required
-def manageusers():
-    if not current_user.is_admin():
-        flash("You don't have permission to access this page.",'error')
-        return redirect(url_for('profile'))
+    if current_user.is_authenticated:
+        return redirect('/landing')
     else:
-        userlist = User.query.filter_by(type=0) #this is a user list of Non-Admin Users
-        return render_template('manageusers.html', userlist=userlist)
+        form = LogIn(request.form)
+        if form.validate_on_submit():
+            #Does email exist in db?
+            user = User.query.filter_by(email=form.email.data).first()
+            if user:
+                #Is pass correct?
+                if user.password == form.password.data:
+                    #If email exists and pass is correct, login.
+                    login_user(user)
+                    flash('Logged in successfully.','login')
+                    return redirect(url_for('landing'))
+            flash ('Invalid email or password.', 'error')
+        return render_template('login.html', form=form)
 
 #//////////////////////////VENUES
 @app.route("/venue/manage", methods=['GET'])
@@ -215,6 +214,9 @@ def editvenue(id):
         image_file = url_for('static', filename='images/upload/' + Venue.image_file)
         form = AddVenue()
         if form.validate_on_submit():
+            if form.image_file.data: #if change in picture, replace picture. otherwise, stay the same
+                picture_file = save_picture(form.image_file.data)
+                venue.image_file = picture_file
             venue.name = form.name.data
             venue.college = COLLEGENAMES.get(form.college.data)
             venue.capacity = form.capacity.data
@@ -274,10 +276,10 @@ def addevent():
         else:
             if form.image_file.data:
                 picture_file = save_picture(form.image_file.data)
-        if form.date_e.data == None:
-            newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_s.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
-        else:
-            newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
+            if form.date_e.data == None:
+                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_s.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
+            else:
+                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
             db.session.add(newevent)
             db.session.commit()
             flash('Event created. An administrator will approve it later.','success')
@@ -356,7 +358,7 @@ def editevent(id):
     event = Events.query.filter_by(id=id).first()
     venue = Venue.query.all()
     image_file = url_for('static', filename='images/upload/' + Events.image_file)
-    form = AddVenue() #EditVenue()
+    form = AddEvent() #EditVenue()
     if form.validate_on_submit():
         if form.image_file.data: #if replacement image exists, replace image. Otherwise, don't edit.
             picture_file = save_picture(form.image_file.data)
@@ -462,8 +464,51 @@ def participate(id):
     else:
         return render_template('profile.html') #return render_template('participate.html', event=event)
 
-#//////////////////////////ADMIN STUFF
+#//////////////////////////ADMIN STUFF: MANAGE USERS
 
+@app.route("/manageusers", methods=['GET','POST'])
+@login_required
+def manageusers():
+    if not current_user.is_admin():
+        flash("You don't have permission to access this page.",'error')
+        return redirect(url_for('profile'))
+    else:
+        userlist = User.query.filter_by(type=0) #this is a user list of Non-Admin Users
+        return render_template('manageusers.html', userlist=userlist)
+
+@app.route("/user/<int:id>/edit", methods=['GET','POST'])
+@login_required
+def edituser():
+    if not current_user.is_admin():
+        flash("You don't have permission to access this page.",'error')
+        return redirect(url_for('profile'))
+    else:
+        user = User.query.filter_by(id=id).first()
+        form = UpdateUser()
+        if form.validate_on_submit():
+            user.fname = form.fname.data
+            user.lname = form.lname.data
+            user.username = form.username.data
+            user.email = form.email.data
+            user.contact = form.contact.data
+            db.session.commit()
+            flash('User has been updated!','success')
+            return redirect(url_for('usermanage'))
+        image_file = url_for('static', filename='images/upload/' + current_user.image_file)
+        return render_template('editprofile.html', image_file=image_file, form=form)
+
+@app.route("/user/<int:id>/delete", methods=['GET','POST'])
+@login_required
+def deleteuser():
+    if not current_user.is_admin():
+        flash("You don't have permission to access this page.",'error')
+        return redirect(url_for('profile'))
+    else:
+        user = User.query.filter_by(id=id).first()
+        db.session.delete(user)
+        db.session.commit()
+        flash('User has been deleted!','success')
+        return redirect(url_for('usermanage'))
 
 #//////////////////////////SV_CHEATS 1
 #The debugging routes.
