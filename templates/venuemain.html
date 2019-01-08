@@ -42,7 +42,7 @@
     <section class="probootstrap-section">
       <div class="container">
         <div>
-        <a href="/profile"><img src="{{ url_for('static', filename='images/back.png') }}" width="100px"></a>  
+        <a href="/venue/manage"><img src="{{ url_for('static', filename='images/back.png') }}" width="100px"></a>  
         </div> 
         <div class="row align-items-center">
           <div class="col-md pl-md-3 pl-0 probootstrap-image-grid">
@@ -59,7 +59,7 @@
 
               {% for college in colleges %}
               <div class="col-md-6">
-                <a class="probootstrap-img-item" href="/venue"><div style="background-image: url(../static/images/colleges/{{college.img}}); background-position: center;"></div></a>
+                <a class="probootstrap-img-item" href="/venue/{{college.id}}"><div style="background-image: url(../static/images/colleges/{{college.img}}); background-position: center;"></div></a>
                 <div class="texttest">
                   <p>{{ college.abb }}</p>
                 </div>

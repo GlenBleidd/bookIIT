@@ -156,9 +156,10 @@ class Events(db.Model):
     end = db.Column('event_time_end', db.Time())
     status = db.Column('event_status', db.String())
     comment = db.column('event_comment', db.String())
+    requestdate = db.Column('event_request_date', db.Date())
     image_file = db.Column('event_img', db.String(), nullable=False)
 
-    def __init__(self, organizer, venue, title, description, tags, date_s, start, date_e, end, status, comment, image_file):
+    def __init__(self, organizer, venue, title, description, tags, date_s, start, date_e, end, status, comment, image_file, requestdate):
         self.organizer = organizer
         self.title = title
         self.description = description
@@ -171,13 +172,14 @@ class Events(db.Model):
         self.status = status
         self.comment = comment
         self.image_file = image_file
+        self.requestdate = requestdate
 
     def participant_count(self):
         return Participant.query.filter_by(event=self.id).count
 
 class Participant(db.Model):
     __tablename__ = "participants"
-    id = db.Column('participant_id', db.Integer , primary_key=True)
+    id = db.Column('particpant_id', db.Integer , primary_key=True)
     event = db.Column('event_id', db.Integer, nullable=False)
     fname = db.Column('fname', db.String())
     lname = db.Column('lname', db.String())
@@ -185,7 +187,6 @@ class Participant(db.Model):
     contact = db.Column('contact', db.String())
 
     def __init__(self, event, fname, lname, email, contact):
-        self.id = id
         self.event = event
         self.fname = fname
         self.lname = lname

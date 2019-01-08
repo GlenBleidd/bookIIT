@@ -112,6 +112,9 @@ class Participate(FlaskForm):
                         validators=[InputRequired(), Email()])
     contact = StringField('Contact Number',
                           validators=[InputRequired(), Length(min=2, max=20)])
+    eventid = IntegerField('Event ID',
+							validators=[DataRequired()])
+    submit = SubmitField('Submit')
 
 class Results(Table):
     id = Col('Id', show= False)

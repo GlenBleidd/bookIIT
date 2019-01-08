@@ -59,10 +59,12 @@ def landing():
 @login_required
 def profile():
     form = UpdateUser()
-    users = User.query.all()
+    accs = Admin_acc.query.all()
+    users = User.query.filter_by(type=0)
+    admins = User.query.filter_by(type=1)
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     events = Events.query.all()
-    return render_template('profile.html', events=events, users=users, form=form, image_file=image_file)
+    return render_template('profile.html', accs=accs, events=events, users=users, admins=admins, form=form, image_file=image_file)
 
 @app.route("/settings", methods=['GET','POST'])
 @login_required
@@ -177,10 +179,10 @@ def venue():
     colleges = College.query.all()
     return render_template('venue.html', venues=venues, colleges=colleges)
 
-@app.route("/venue", methods=['GET'])
+@app.route("/venue/<int:id>", methods=['GET'])
 @login_required
-def dispvenue():
-    venues = Venue.query.all()
+def dispvenue(id):
+    venues = Venue.query.filter_by(college=id)
     colleges = College.query.all()
     return render_template('dispvenue.html', venues=venues, colleges=colleges)
 
@@ -225,7 +227,7 @@ def editvenue(id):
                 picture_file = save_picture(form.image_file.data)
                 venue.image_file = picture_file
             venue.name = form.name.data
-            venue.college = COLLEGENAMES.get(form.college.data)
+            venue.college = form.college.data
             venue.capacity = form.capacity.data
             venue.rate = form.rate.data
             venue.equipment = form.equipment.data
@@ -245,7 +247,7 @@ def deletevenue(id):
         events = Events.query.filter_by(venue=venue.id)
         if venue != None:
             for event in events:
-                flash('NOTICE: An event has been removed because the venue of the event has become unavailable.','Notify'+event.organizer)
+                flash('NOTICE: An event has been removed because the venue of the event has become unavailable.','Notify'+str(event.organizer))
                 db.session.delete(event)
                 db.session.commit()
             db.session.delete(venue)
@@ -286,9 +288,9 @@ def addevent():
             if form.image_file.data:
                 picture_file = save_picture(form.image_file.data)
             if form.date_e.data == None:
-                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_s.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
+                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_s.data,end=form.end.data, status='Pending', comment='',image_file=picture_file, requestdate=datetime.datetime.today())
             else:
-                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending', comment='',image_file=picture_file)
+                newevent = Events(organizer=current_user.id, title=form.title.data, description=form.description.data, venue=form.venue.data.id, tags=form.tags.data, date_s=form.date_s.data,start=form.start.data, date_e=form.date_e.data,end=form.end.data, status='Pending', comment='',image_file=picture_file, requestdate=datetime.datetime.today())
             db.session.add(newevent)
             db.session.commit()
             flash('Event created. An administrator will approve it later.','success')
@@ -314,7 +316,7 @@ disps = [
 def Autorejecter():
     events = Events.query.all()
     for event in events:
-        if(event.status == 'Pending' and event.request < datetime.date.today()):
+        if(event.status == 'Pending' and event.requestdate < datetime.date.today()):
             event.status = 'Rejected.'
             event.comment = 'Time has already lapsed. Please Rebook or Cancel this request.'
             db.session.commit()
@@ -332,14 +334,21 @@ def event():
         users = User.query.all()
         return render_template('events.html', form=form, venues=venues, events=events, users=users)
 
-@app.route("/event", methods=['GET'])
+@app.route("/event", methods=['GET', 'POST'])
 def dispevent():
     venues = Venue.query.all()
     form = Participate()
     Autorejecter()
+    participants = Participant.query.all()
     events = Events.query.filter_by(status='Approved')
     users = User.query.all()
-    return render_template('dispevent.html', venues=venues, events=events, users=users, form=form, disps=disps)
+    if form.validate_on_submit():
+        newparticipant = Participant(event=form.eventid.data, fname=form.fname.data, lname=form.lname.data, email=form.email.data, contact=form.contact.data)
+        db.session.add(newparticipant)
+        db.session.commit()
+        flash('Participant added.','success')
+        return redirect('/event')
+    return render_template('dispevent.html', participants=participants, venues=venues, events=events, users=users, form=form, disps=disps)
 
 @app.route("/event/<int:id>/participants", methods=['GET'])
 def participantlist():
@@ -348,18 +357,18 @@ def participantlist():
     participants = Participant.query.all()
     return render_template('dispevent.html', venues=venues, events=events, participants=participants)
 
-@app.route("/deleteparticipant/<int:id>", methods=['POST'])
+@app.route("/deleteparticipant/<int:id>", methods=['GET','POST'])
 @login_required
 def delparticipant(id):
-    participant = Participant.query.filter_by(id=id)
-    event = Events.query.filter_by(id = participant.event)
+    participant = Participant.query.filter_by(id=id).first()
+    event = Events.query.filter_by(id = participant.event).first()
     if current_user.is_admin() or current_user.id == event.organizer:
         db.session.delete(participant)
         db.session.commit()
-        return redirect(url_for('dispevent'))
+        return redirect('/event')
     else:
         flash('Error. You have no permission to delete this participant from the event.','error')
-        return redirect(url_for('dispevent'))
+        return redirect('/event')
 
 @app.route("/editevent/<int:id>", methods=['GET','POST'])
 @login_required
@@ -375,7 +384,7 @@ def editevent(id):
             flash('Error. Date or Time start chosen has already passed!','error')
         elif(form.date_s.data < weekfromnow):
             flash('Error. You can only book dates from at least one week from today!','error')
-        elif not check_availability(form.date_s.data, form.date_e.data, form.start.data, form.end.data, form.venue.data.id): #if not available
+        elif not check_availability(form.date_s.data, form.date_e.data, form.start.data, form.end.data, form.venue.data.id, event.id): #if not available
             flash('Venue has been booked for another event at this time.','error')
         else:
             if form.image_file.data: #if replacement image exists, replace image. Otherwise, don't edit.
@@ -388,30 +397,30 @@ def editevent(id):
             event.date_e=form.date_e.data
             event.end=form.end.data
             event.tags=form.tags.data
-            if event.venue != form.venue.data.id: #if venue was changed, set back to pending.
-                event.venue=form.venue.data.id
-                event.status='Pending'
-                event.comment='Venue has changed. Need approval from administrator.'
+            event.venue=form.venue.data.id
+            event.status='Pending'
+            event.comment='Venue has changed. Need approval from administrator.'
+            event.requestdate=datetime.datetime.today()
             db.session.commit()
             flash('Your event details have been changed.','success')
-            return redirect(url_for('events'))
-    return render_template('editevent.html', form=form, event=event, venue=venue, image_file=image_file)
+            return redirect(url_for('profile'))
+    return render_template('rebook.html', form=form, event=event, venue=venue, image_file=image_file)
 
 @app.route("/deleteevent/<int:id>", methods=['GET','POST'])
 @login_required
 def deleteevent(id):
     event = Events.query.filter_by(id=id).first()
     if event != None:
-        participants = Participant.query.filter_by(event=event.id)
-        for participant in participants:
-            db.session.delete(participant)
+        participantlist = Participant.query.filter_by(event=event.id)
+        for p in participantlist:
+            db.session.delete(p)    
             db.session.commit()
         db.session.delete(event)
         db.session.commit()
         flash('Event has been deleted.','success')
     else:
         flash('No such event exists!','error')
-    return redirect(url_for('events'))
+    return redirect(url_for('profile'))
 
 @app.route("/event/<int:id>/approved", methods=['GET', 'POST'])
 @login_required
@@ -423,7 +432,7 @@ def approveevent(id):
         event = Events.query.filter_by(id=id).first()
         event.status = 'Approved'
         db.session.commit()
-        flash('Your event has been approved!','Notify'+event.organizer)
+        flash('Your event has been approved!','Notify'+str(event.organizer))
         return redirect(url_for('profile'))
 
 @app.route("/event/<int:id>/rejected", methods=['POST'])
@@ -436,7 +445,7 @@ def rejectedevent(id):
         event = Events.query.filter_by(id=id).first()
         event.status = 'Rejected'
         db.session.commit()
-        flash('Your event has been rejected! Please review it as soon as possible.','Notify'+event.organizer)
+        flash('Your event has been rejected! Please review it as soon as possible.','Notify'+str(event.organizer))
         return redirect(url_for('profile'))
 
 @app.route("/event/<int:id>/participants", methods=['GET','POST'])
