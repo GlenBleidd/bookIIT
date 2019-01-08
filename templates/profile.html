@@ -70,7 +70,7 @@
               </div>
               <!-- END SIDEBAR BUTTONS -->
               <!-- SIDEBAR MENU -->
-              
+
               <div class="profile-usermenu">
                 <ul>
                   <li>
@@ -180,7 +180,7 @@
                           {% endfor %}
                         {% endif %}
                   </div>
-                    
+
 
                   <form class="form-horizontal" role="form" style="width: 100%">
                     <div class="form-group">
@@ -240,7 +240,7 @@
 
                     <div class="cardd hovercard" style="height: 350px;">
                         <div class="cardheader">
-                       
+
                         </div>
                         <div class="avatar">
                             <img src="{{ url_for('static', filename='images/upload/'+ acc.image_file )}}">
@@ -254,7 +254,7 @@
                             <div class="desc">cellphon#</div>
                             <div class="desc">telephone#</div>
                         </div>
-                      
+
                         <!-- <div class="bottom">
                             <a class="btn btn-primary btn-twitter btn-sm" href="https://twitter.com/webmaniac">
                                 <i class="fa fa-twitter"></i>
@@ -276,9 +276,9 @@
                   {% endif %}
                   {% endfor %}
                   {% endfor %}
-                    
 
-                  
+
+
                 </div>
               </div>
 
@@ -300,7 +300,7 @@
                     <p>{{ event.description }}</p>
                     <p>{{ event.date_s.strftime("%d-%B-%Y") }}</p>
                     <p>{{ event.start.strftime("%I:%M %p") }} - {{ event.end.strftime("%I:%M %p") }}</p>
-                    
+
                     {% if event.status == 'Rejected' %}
                     <p>{{ event.comment }}</p>
                     {% endif %}
