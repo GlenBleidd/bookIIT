@@ -48,7 +48,7 @@
           <div class="col-md pl-md-3 pl-0 probootstrap-image-grid">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <ul class=flashes>
+                    <ul class="alert" style="color: #fff; background-color: #3c3b3bb3;" role="alert">
                         {% for message in messages %}
                             <li>{{ message }}</li>
                         {% endfor %}

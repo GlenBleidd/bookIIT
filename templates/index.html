@@ -37,13 +37,13 @@
             <div class="probootstrap-text">
               {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <ul class=flashes>
+                    <ul class="alert" style="color: #fff; background-color: #3c3b3bb3;" role="alert">
                         {% for message in messages %}
                             <li>{{ message }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
-            {% endwith %}
+              {% endwith %}
               <h1 class="probootstrap-heading text-white mb-4">
               </h1><img src="{{ url_for('static', filename='images/homelogo.png') }}" alt="Home"</a></h1>
                 <p>
@@ -69,15 +69,6 @@
       <div class="modal-body">
               <form class="login100-form-main validate-form" action="/login" method="POST">
             {{ form.csrf_token }}
-            {% with messages = get_flashed_messages() %}
-                {% if messages %}
-                    <ul class=flashes>
-                        {% for message in messages %}
-                            <li>{{ message }}</li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-            {% endwith %}
           <span class="login100-form-title">
             Member Login
           </span>
