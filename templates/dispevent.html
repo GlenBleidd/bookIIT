@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Events</title>
+    <title>Event Calendar</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
@@ -36,7 +36,7 @@
         <div class="collapse navbar-collapse" id="probootstrap-nav">
           <ul class="navbar-nav ml-auto">
             <div class="dropdown">
-                <button class="dropbtn"><img src="{{ url_for('static', filename='images/user.png') }}"></button>
+                <button class="dropbtn"><img src="{{ url_for('static', filename='images/upload/'+ current_user.image_file )}}" width="60" height="60" style="border-style: none;border-radius: 30px;"></button>
                 <div class="dropdown-content">
                 <a href="/profile">Profile</a>
                 <a href="/logout">Log Out</a>
@@ -44,7 +44,7 @@
             </div>
 
           </ul>
-            Logged in as {{current_user.username}}
+              Logged in as {{current_user.username}}
         </div>
       </div>
     </nav>
@@ -53,7 +53,7 @@
       <div class="container" style="padding-top: 50px;">
         <div class="row">
             {% for disp in disps %}
-            <button class="tablink w3-animate-opacity" style="background-color: {{ disp.color }};" onclick="openPage('{{ disp.month }}', this, '{{ disp.color }}88')">{{ disp.month }}</button>
+            <button class="tablink w3-animate-opacity" onclick="openPage('{{ disp.month }}', this, '{{ disp.color }}88')">{{ disp.month }}</button>
             {% endfor %}
             {% for disp in disps %}
             <div id="{{ disp.month }}" class="tabcontent">
@@ -80,7 +80,7 @@
                         {%endif%}{%endfor%}
                         <p class="desc">{{ event.description| truncate(100, False) | safe }}</p>
                         <ul>
-                            <li style="width:50%;"><a href="#website"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </a></li>
+                            <li style="width:50%;" data-toggle="modal" data-target="#participate{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </a></li>
                             <li style="width:50%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
                         </ul>
                     </div>
@@ -144,8 +144,70 @@
     </div>
   </div>
 </div>
+
+
+
+<div id="participate{{ event.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog" style="max-width: 75%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="product-title">{{ event.title }}</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="wrap-login100-2">
+
+        <form class="login100-form validate-form" action="/register" method="POST">
+            {{ form.csrf_token }}
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+          
+          <div class="row" style="margin-top: 30px;">
+            <div class="wrap-input100 validate-input" data-validate = "Please enter First Name">
+              {{ form.fname.label(class="form-control-label") }}
+              {{ form.fname(class="input100", value=current_user.fname) }}
+            </div>
+          
+            <div class="wrap-input100 validate-input" data-validate = "Please enter Last Name">
+              {{ form.lname.label(class="form-control-label") }}
+              {{ form.lname(class="input100", value=current_user.lname) }}
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+              {{ form.email.label(class="form-control-label") }}
+              {{ form.email(class="input100", value=current_user.email) }}
+            </div>
+
+            <div class="wrap-input100 validate-input" data-validate = "Please provide a Contact Number">
+              {{ form.contact.label(class="form-control-label") }}
+              {{ form.contact(class="input100", value=current_user.contact) }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="wrap-input100">
+              <br>
+                <input type="submit" class="login100-form-btn" value="Join Event">
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
 {% endfor %}
 {% endfor %}
+
 
 
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
@@ -156,4 +218,5 @@
     <script src="{{ url_for('static', filename='js/event.js') }}"></script>
   </body>
 </html>
+
 

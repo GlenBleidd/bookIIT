@@ -1,7 +1,7 @@
 import flask, time, secrets, os
 from PIL import Image
 from flask import request, flash, url_for, redirect, render_template
-from forms import Registration, LogIn, AddVenue, AddEvent, EventReg, UpdateUser
+from forms import Registration, LogIn, AddVenue, AddEvent, EventReg, UpdateUser, Participate
 from flask_login import login_user , logout_user , current_user , login_required, LoginManager
 from config import app, db
 from Models import Acc, User, Venue, Events, College, Admin_acc
@@ -49,11 +49,12 @@ def landing():
 @app.route("/profile", methods=['GET','POST'])
 @login_required
 def profile():
+    form = UpdateUser()
     users = User.query.all()
     accs = Acc.query.all()
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     events = Events.query.all()
-    return render_template('profile.html', accs=accs, events=events, users=users, image_file=image_file)
+    return render_template('profile.html', accs=accs, events=events, users=users, form=form, image_file=image_file)
 
 @app.route("/settings", methods=['GET','POST'])
 @login_required
@@ -244,9 +245,10 @@ def event():
 @app.route("/event", methods=['GET'])
 def dispevent():
     venues = Venue.query.all()
+    form = Participate()
     events = Events.query.filter_by(status='Approved')
     users = User.query.all()
-    return render_template('dispevent.html', venues=venues, events=events, users=users, disps=disps)
+    return render_template('dispevent.html', venues=venues, events=events, users=users, form=form, disps=disps)
 
 @app.route("/editevent/<int:id>", methods=['GET','POST'])
 @login_required
