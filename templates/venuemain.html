@@ -42,9 +42,9 @@
     <section class="probootstrap-section">
       <div class="container">
         <div>
-        <a href="/venue/manage"><img src="{{ url_for('static', filename='images/back.png') }}" width="100px"></a>  
+        <a href="/venue/manage"><img src="{{ url_for('static', filename='images/back.png') }}" style="width: 100px; margin-top: 15px;"></a>  
         </div> 
-        <div class="row align-items-center">
+        <div class="row align-items-center" style="padding-top: 5px;">
           <div class="col-md pl-md-3 pl-0 probootstrap-image-grid">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}

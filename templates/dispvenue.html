@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/dispbox.css') }}">
   </head>
 
-  <body>
+  <body style="min-height: 650px;">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark probootstrap-navabr-dark">
       <div class="container">
         <a class="navbar-brand" href="/landing"><img src="{{ url_for('static', filename='images/logo.png') }}" width="150" height="75"></a>
@@ -43,7 +43,7 @@
     <section class="probootstrap-section">
       <div class="container">
         <div>
-        <a href="/venue-main"><img src="{{ url_for('static', filename='images/back.png') }}" width="100px"></a>  
+        <a href="/venue-main"><img src="{{ url_for('static', filename='images/back.png') }}" style="width: 100px; margin-top: 15px;"></a>  
         </div> 
         <div class="row align-items-center">
           <div class="col-md pl-md-3 pl-0 probootstrap-image-grid">
@@ -61,7 +61,7 @@
               {% for venue in venues %}
               {% for college in colleges %}
               {% if venues|selectattr('college','equalto',college.id)|list|length == 0 and college.id == venue.id %}
-                <div class="col-md-4 col-sm-6" style="padding-top: 5px; padding-bottom: 15px;  ">
+                <div class="col-md-4 col-sm-6" style="padding-top: 15px; padding-bottom: 15px;  ">
                   <div class="box8">
                       <img src="{{ url_for('static', filename='images/upload/'+ venue.image_file )}}">
                       <p hidden>{{ venue.id }}</p>
@@ -90,7 +90,7 @@
       {% for user in users %}
       {% for college in colleges %}
       {% if admin.college == college.id and admin.id == user.id %}
-     <div class="container-fluid bg-primary py-3">
+     <div class="container-fluid bg-primary py-3" style="margin-top: 240px;">
         <div class="container">
           <div class="row">
             <div class="col-md-7" style="max-width: 49.333%;">
