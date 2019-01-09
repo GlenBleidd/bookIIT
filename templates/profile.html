@@ -126,7 +126,7 @@
                         </div>
                     </div>
                     {% endif %}
-                  {% elif events|selectattr('organizer','equalto', current_user.id )|list|length == 0%}
+                  {% elif events|selectattr('organizer','equalto', current_user.id )|list|length == 0 %}
                     <!-- {% if event.status == 'PH' %} -->
                     <img src="{{ url_for('static', filename='images/noevents.png') }}" style="width: 80%; margin: auto; margin-top: 70px; border-radius: 1rem;">
                     <!-- {% endif %} -->
@@ -239,7 +239,7 @@
                 <div class="row">
                   {% for admin in admins|sort(attribute='id') %}
                   {% for acc in accs %}
-                  {% for college in colleges|sort(attribute='id') %}
+                  {% for college in colleges %}
                   {% if admin.id == acc.id and acc.college == college.id %}
                   <div class="col-lg-3 col-sm-6" style="max-width: 33%;">
 
@@ -256,7 +256,7 @@
                             </div>
                             <div class="desc">{{ college.abb }}</div>
                             <div class="desc">{{ admin.email }}</div>
-                            <div class="desc">{{ admin.contact }}</div>
+                            <div class="desc">{{ admin.contact }} {{ admin.id }}</div>
                             <div class="desc">telephone#</div>
                         </div>
                     </div>
@@ -278,7 +278,7 @@
 
     {% for event in events %}
         <div id="event{{ event.id }}" class="modal fade" role="dialog">
-            <div class="modal-dialog">
+            <div class="modal-dialog" style="max-width: 50%;">
                 <div class="modal-content">
                   <div class="modal-header">
                     <h4 class="modal-title">{{ event.title }}</h4>
@@ -295,6 +295,30 @@
                     {% endif %}
 
                   </div>
+                  <div class="table-responsive">
+              <table id="mytable" class="table table-bordred table-striped">
+               <thead>
+                 <th>Last Name</th>
+                 <th>First Name</th>
+                 <th>Email</th>
+                 <th>Contact</th>
+                 <th>Delete</th>
+               </thead>
+                <tbody>
+                  <tr>
+                    {% for p in participants %}
+                    {% if p.event == event.id %}
+                    <td>{{p.lname}}</td>
+                    <td>{{p.fname}}</td>
+                    <td>{{p.email}}</td>
+                    <td>{{p.contact}}</td>
+                    <td><button action="/deleteparticipant/{{p.id}}" onclick="return confirm('Are you sure you want to delete this item?');"><img src="{{ url_for('static', filename='images/deleteuser.png') }}"></button></td>
+                    {% endif %}
+                    {% endfor %}
+                  </tr> 
+                </tbody>
+              </table>
+            </div>
                   <div class="modal-footer">
                     
                     <!-- <button type="button" action="" class="btn2 btn2-default" style="background-color: #00ff00">Edit</button> -->
