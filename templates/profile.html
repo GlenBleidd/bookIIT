@@ -126,8 +126,10 @@
                         </div>
                     </div>
                     {% endif %}
-                  {% elif events|selectattr('organizer','equalto','{{current_user.id}}')|list|length == 0 and event.status != 'PH' %}
+                  {% elif events|selectattr('organizer','equalto', current_user.id )|list|length == 0%}
+                    <!-- {% if event.status == 'PH' %} -->
                     <img src="{{ url_for('static', filename='images/noevents.png') }}" style="width: 80%; margin: auto; margin-top: 70px; border-radius: 1rem;">
+                    <!-- {% endif %} -->
                   {% endif %}
                   {% endfor %}
                 </div>
@@ -235,13 +237,14 @@
 
               <div id="About" class="tabcontent" style="padding-right: auto;">
                 <div class="row">
-                  {% for admin in admins %}
+                  {% for admin in admins|sort(attribute='id') %}
                   {% for acc in accs %}
-                  {% if admin.id == acc.id %}
+                  {% for college in colleges|sort(attribute='id') %}
+                  {% if admin.id == acc.id and acc.college == college.id %}
                   <div class="col-lg-3 col-sm-6" style="max-width: 33%;">
 
                     <div class="cardd hovercard" style="height: 350px;margin-bottom: 20px;border-radius: 20px;">
-                        <div class="cardheader">
+                        <div class="cardheader" style="background-image: url(../static/images/colleges/{{college.img}}); background-position: center;">
 
                         </div>
                         <div class="avatar">
@@ -251,14 +254,15 @@
                             <div class="title">
                                 <a target="_blank" href="https://scripteden.com/">{{admin.fname + ' ' + admin.lname}}</a>
                             </div>
-                            <div class="desc">{{ acc.college }}</div>
+                            <div class="desc">{{ college.abb }}</div>
                             <div class="desc">{{ admin.email }}</div>
-                            <div class="desc">cellphon#</div>
+                            <div class="desc">{{ admin.contact }}</div>
                             <div class="desc">telephone#</div>
                         </div>
                     </div>
                   </div>
                   {% endif %}
+                  {% endfor %}
                   {% endfor %}
                   {% endfor %}
 

@@ -36,15 +36,21 @@ class User(db.Model):
     email = db.Column('email', db.String(), unique=True, index=True)
     fname = db.Column('fname', db.String())
     lname = db.Column('lname', db.String())
+    profession = db.column('profession', db.String())
+    contact = db.column('contact', db.String())
+    about = db.column('about', db.String())
     image_file = db.Column('img', db.String(), nullable=False, default='default.png')
 
-    def __init__(self, username, password, email, fname, lname):
+    def __init__(self, username, password, email, fname, lname, profession, contact, about):
         self.username = username
         self.type = 0;
         self.password = password
         self.email = email
         self.fname = fname
         self.lname = lname
+        self.profession = profession
+        self.contact = contact
+        self.about = about
 
     def is_authenticated(self):
         return True
@@ -114,7 +120,7 @@ class Venue(db.Model):
     capacity = db.Column('capacity', db.Integer())
     rate = db.Column('rate', db.Integer)
     equipment = db.Column('equipment', db.String())
-    image_file = db.Column('venue_img', db.String(), nullable=False)
+    image_file = db.Column('venue_img', db.String(), nullable=False, default='defaultvenue.jp   g')
 
     def __init__(self, name, college, capacity, rate, equipment, image_file):
         self.name = name
@@ -157,7 +163,7 @@ class Events(db.Model):
     status = db.Column('event_status', db.String())
     comment = db.column('event_comment', db.String())
     requestdate = db.Column('event_request_date', db.Date())
-    image_file = db.Column('event_img', db.String(), nullable=False)
+    image_file = db.Column('event_img', db.String(), nullable=False, default='defaultevents.jpg')
 
     def __init__(self, organizer, venue, title, description, tags, date_s, start, date_e, end, status, comment, image_file, requestdate):
         self.organizer = organizer
