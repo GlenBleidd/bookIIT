@@ -10,10 +10,10 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formsmain.css') }}">    
     <link rel="stylesheet" href="{{ url_for('static', filename='css/eventstyle.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/formsmain.css') }}">    
   </head>
 
   <body>
@@ -45,7 +45,7 @@
       <div class="container">
         <div class="row">
             {% for event in events|sort(attribute='date_s') %}
-            <!-- {% if event.status == 'Pending'%} -->
+            {% if event.status == 'Pending' and events|selectattr('status','equalto','Pending')|list|length != 0 %}
             <ul class="event-list">
                 <li>
                     <time datetime="2014-07-20">
@@ -59,13 +59,15 @@
                     </time>
                     <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}">
                     <div class="info">
-                        <h2 class="title">{{ event.title }}</h2>
+                        <div class="row" style="margin-left: 10px;">
+                            <h2 class="title">{{ event.title }}</h2>
+                            <p class="stat" style="margin-left: auto; margin-right: 65px;"> {{ event.status }} </p>
+                        </div>
                         {% for user in users %}
                         {% if user.id == event.organizer %}
                         <p class="desc">{{ user.fname + ' ' + user.lname }}</p>
                         {%endif%}{%endfor%}
                         <p class="desc">{{ event.description }}</p>
-                        <p class="stat">{{ event.status }}</p>
                     </div>
                     <div class="social">
                         <ul>
@@ -77,7 +79,14 @@
                     </div>
                 </li>
             </ul>
-            {%endif %}
+            {% elif event.status == 'PH' and events|selectattr('status','equalto','Pending')|list|length == 0 %}
+            <ul class="event-list">
+                <img src="{{ url_for('static', filename='images/noreqbanner.png') }}" style="width: 100%; margin-top: 70px; border-radius: 1rem;">
+                <div class="row">
+                    <a type=button href="/landing" style="margin: auto;"><img src="{{ url_for('static', filename='images/back.png') }}" style="max-width: 100px; margin: auto; margin-top: 70px;"></a>
+                </div>
+            </ul>
+            {% endif %}
             {% endfor %}
         </div>
       </div>

@@ -98,34 +98,36 @@
                 <div class="row">
                   {%  for event in events | sort(attribute='date_s') %}
                   {% if event.organizer == current_user.id %}
-                  {% if event.status == 'Approved' %}
-                  <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
-                      <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
-                      <div class="card-body" style="background-color: #b2f977">
-                        <p hidden>{{ event.event_id }}</p>
-                        <h5 class="card-title">{{ event.title }}</h5>
-                        <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
-                      </div>
-                  </div>
-                  {% elif event.status == 'Rejected' %}
-                  <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
-                      <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
-                      <div class="card-body" style="background-color: #f97f66">
-                        <p hidden>{{ event.event_id }}</p>
-                        <h5 class="card-title">{{ event.title }}</h5>
-                        <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
-                      </div>
-                  </div>
-                  {% elif event.status == 'Pending' %}
-                  <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
-                      <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
-                      <div class="card-body" style="background-color: #777777">
-                        <p hidden>{{ event.event_id }}</p>
-                        <h5 class="card-title">{{ event.title }}</h5>
-                        <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
-                      </div>
-                  </div>
-                  {% endif %}
+                    {% if event.status == 'Approved' %}
+                    <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                        <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                        <div class="card-body" style="background-color: #b2f977">
+                          <p hidden>{{ event.event_id }}</p>
+                          <h5 class="card-title">{{ event.title }}</h5>
+                          <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                        </div>
+                    </div>
+                    {% elif event.status == 'Rejected' %}
+                    <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                        <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                        <div class="card-body" style="background-color: #f97f66">
+                          <p hidden>{{ event.event_id }}</p>
+                          <h5 class="card-title">{{ event.title }}</h5>
+                          <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                        </div>
+                    </div>
+                    {% elif event.status == 'Pending' %}
+                    <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                        <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                        <div class="card-body" style="background-color: #777777">
+                          <p hidden>{{ event.event_id }}</p>
+                          <h5 class="card-title">{{ event.title }}</h5>
+                          <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                  {% elif events|selectattr('organizer','equalto','{{current_user.id}}')|list|length == 0 and event.status != 'PH' %}
+                    <img src="{{ url_for('static', filename='images/noevents.png') }}" style="width: 80%; margin: auto; margin-top: 70px; border-radius: 1rem;">
                   {% endif %}
                   {% endfor %}
                 </div>
@@ -233,7 +235,7 @@
 
               <div id="About" class="tabcontent" style="padding-right: auto;">
                 <div class="row">
-                                    {% for admin in admins %}
+                  {% for admin in admins %}
                   {% for acc in accs %}
                   {% if admin.id == acc.id %}
                   <div class="col-lg-3 col-sm-6" style="max-width: 33%;">
@@ -280,7 +282,7 @@
                   </div>
                   <div class="modal-body2">
                     <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" style="max-width: 100%">
-                    <p>{{ event.description }}</p>
+                    <p style="white-space: pre-line;">{{ event.description }}</p>
                     <p>{{ event.date_s.strftime("%d-%B-%Y") }}</p>
                     <p>{{ event.start.strftime("%I:%M %p") }} - {{ event.end.strftime("%I:%M %p") }}</p>
 

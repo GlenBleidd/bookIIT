@@ -330,7 +330,8 @@ def event():
     else:
         form = EventReg()
         venues = Venue.query.all()
-        events = Events.query.filter_by(status='Pending')
+        # events = Events.query.filter_by(status='Pending')
+        events = Events.query.all()
         users = User.query.all()
         return render_template('events.html', form=form, venues=venues, events=events, users=users)
 
@@ -433,7 +434,7 @@ def approveevent(id):
         event.status = 'Approved'
         db.session.commit()
         flash('Your event has been approved!','Notify'+str(event.organizer))
-        return redirect(url_for('profile'))
+        return redirect(url_for('event'))
 
 @app.route("/event/<int:id>/rejected", methods=['POST'])
 @login_required
