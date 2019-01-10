@@ -16,14 +16,16 @@ Licensed under MIT
   border-radius: 15px
 }
 
-.profile-userpic img {
+.profile-userpic {
   float: none;
   margin: 0 25%;
-  width: 50%;
-  height: 50%;
+  width: 125px;
+  height: 125px;
   -webkit-border-radius: 50% !important;
   -moz-border-radius: 50% !important;
   border-radius: 50% !important;
+  background-position: center;
+  background-size: cover;
 }
 
 .profile-usertitle {

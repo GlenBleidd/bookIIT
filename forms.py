@@ -116,6 +116,10 @@ class Participate(FlaskForm):
 							validators=[DataRequired()])
     submit = SubmitField('Submit')
 
+class SearchForm(FlaskForm):
+    search_id = StringField('Search for Tags, Organizer, Event Title...',  validators = [InputRequired("Enter Student ID")])
+    submit = SubmitField("Submit")
+
 class Results(Table):
     id = Col('Id', show= False)
     organizer = Col('Organizer')
