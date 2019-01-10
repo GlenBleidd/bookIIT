@@ -364,6 +364,7 @@ def dispevent():
     Autorejecter()
     participants = Participant.query.all()
     events = Events.query.filter_by(status='Approved')
+    count = Events.query.filter_by(status='Approved').count()
     users = User.query.all()
     if form.validate_on_submit():
         newparticipant = Participant(event=form.eventid.data, fname=form.fname.data, lname=form.lname.data, email=form.email.data, contact=form.contact.data)
@@ -371,7 +372,7 @@ def dispevent():
         db.session.commit()
         flash('Participant added.','success')
         return redirect('/event')
-    return render_template('dispevent.html', participants=participants, venues=venues, events=events, users=users, form=form, disps=disps, search=search)
+    return render_template('dispevent.html', participants=participants, count=count, venues=venues, events=events, users=users, form=form, disps=disps, search=search)
 
 @app.route("/eventanon", methods=['GET', 'POST'])
 def dispeventanon():
