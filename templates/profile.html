@@ -173,11 +173,11 @@
 
               <div id="AccountSettings" class="tabcontent" style="padding-right: auto;">
                 <div class="row">
-                  <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}}); margin: 0px 2%;">
+                  <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}}); margin: 0px 2%; margin-left: 20%;">
               </div>
                   <div class="venueform-wrap-2">
                   {{ form.image_file.label() }}
-                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file,) }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file, style="width: 100%") }}
                         {% if form.image_file.errors %}
                           {% for error in form.image_file.errors %}
                             <span class="text-danger">{{ error }}</span>
@@ -186,46 +186,46 @@
                   </div>
 
 
-                  <form class="form-horizontal" role="form" style="width: 100%">
+                  <form class="form-horizontal" role="form" style="width: 100%;padding-left: 25px;padding-right: 25px;">
                     <div class="form-group">
                       <label class="col-lg-3 control-label">First name:</label>
-                      <div class="col-lg-8">
+                      <div class="col-lg-8" style="max-width: 100%;">
                         {{ form.fname(class="form-control pb_height-50 reverse" , placeholder="First Name", value=current_user.fname) }}
                       </div>
                     </div>
                     <div class="form-group">
                       <label class="col-lg-3 control-label">Last name:</label>
-                      <div class="col-lg-8">
+                      <div class="col-lg-8" style="max-width: 100%;">
                         {{ form.lname(class="form-control pb_height-50 reverse" , placeholder="Last Name", value=current_user.lname) }}
                       </div>
                     </div>
                     <div class="form-group">
                       <label class="col-lg-3 control-label">Email:</label>
-                      <div class="col-lg-8">
+                      <div class="col-lg-8" style="max-width: 100%;">
                         {{ form.email(class="form-control pb_height-50 reverse" , placeholder="Email", value=current_user.email) }}
                       </div>
                     </div>
                     <div class="form-group">
                       <label class="col-lg-3 control-label">Contact:</label>
-                      <div class="col-lg-8">
+                      <div class="col-lg-8" style="max-width: 100%;">
                         {{ form.contact(class="form-control pb_height-50 reverse" , placeholder="Contact Number", value=current_user.contact) }}
                       </div>
                     </div>
                     <div class="form-group">
                       <label class="col-md-3 control-label">Profession:</label>
-                      <div class="col-md-8">
+                      <div class="col-md-8" style="max-width: 100%;">
                         {{ form.profession(class="form-control pb_height-50 reverse" , placeholder="Profession", value=current_user.profession) }}
                       </div>
                     </div>
                     <div class="form-group">
                       <label class="col-md-3 control-label">About:</label>
-                      <div class="col-md-8">
+                      <div class="col-md-8" style="max-width: 100%;">
                         {{ form.bio(class="form-control pb_height-50 reverse" , placeholder="Say something about yourself.") }}
                       </div>
                     </div>
                     <div class="form-group">
                       <label class="col-md-3 control-label"></label>
-                      <div class="col-md-8">
+                      <div class="col-md-8" style="max-width: 100%;">
                         <input type="button" class="btn btn-primary" value="Save Changes">
                         <span></span>
                         <input type="reset" class="btn btn-default" value="Cancel">
@@ -247,10 +247,9 @@
                         <div class="cardheader" style="background-image: url(../static/images/colleges/{{college.img}}); background-position: center;">
 
                         </div>
-                        <div class="avatar">
-                            <img src="{{ url_for('static', filename='images/upload/'+ admin.image_file )}}">
+                        <div class="avatar" style="background-image: url(../static/images/upload/{{admin.image_file}}); margin-top: -15px;">
                         </div>
-                        <div class="info">
+                        <div class="info" style="margin-top: -50px;">
                             <div class="title">
                                 <a target="_blank" href="https://scripteden.com/">{{admin.fname + ' ' + admin.lname}}</a>
                             </div>
