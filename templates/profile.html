@@ -27,7 +27,7 @@
           <ul class="navbar-nav ml-auto">
             <li class="nav-item"><a href="/event" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
             <div class="dropdown">
-                <button class="dropbtn"><img src="{{ url_for('static', filename='images/upload/'+ current_user.image_file )}}" width="60" height="60" style="border-style: none;border-radius: 30px;"></button>
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
                 <div class="dropdown-content">
                 <a href="#">Profile</a>
                 <a href="/logout">Log Out</a>
@@ -45,8 +45,7 @@
           <div class="col-md-3">
             <div class="profile-sidebar">
               <!-- SIDEBAR USERPIC -->
-              <div class="profile-userpic">
-                <img src="{{ url_for('static', filename='images/upload/'+ current_user.image_file )}}">
+              <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}});">
               </div>
               <!-- END SIDEBAR USERPIC -->
               <!-- SIDEBAR USER TITLE -->
@@ -161,7 +160,7 @@
                                         <a href="#">{{ user.email }}</a>
                                     </td>
                                     <td>
-                                        <a href="#"><img src="{{ url_for('static', filename='images/deleteuser.png')}}"> Delete</a>
+                                        <a href="/user/{{user.id}}/delete" onclick="return confirm('Are you sure you want to delete {{user.fname + ' ' + user.lname}}?');"><img src="{{ url_for('static', filename='images/deleteuser.png')}}"> Delete</a>
                                     </td>
                                 </tr>
                                 

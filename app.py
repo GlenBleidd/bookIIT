@@ -1,7 +1,7 @@
 import flask, time, secrets, os
 from PIL import Image
 from flask import request, flash, url_for, redirect, render_template
-from forms import Registration, LogIn, AddVenue, AddEvent, EventReg, UpdateUser, Participate, Results
+from forms import Registration, LogIn, AddVenue, AddEvent, EventReg, UpdateUser, Participate, Results, SearchForm
 from flask_login import login_user , logout_user , current_user , login_required, LoginManager
 from config import app, db
 from Models import *
@@ -145,7 +145,7 @@ def register():
                 flash('Email already used. Use a different email address.','error')
                 return redirect(url_for('register'))
             #if user,email does not exist yet, and passwords match, register.
-            newacc = User(username=form.username.data, password=form.password.data, email=form.email.data, fname=form.fname.data, lname=form.lname.data)
+            newacc = User(username=form.username.data, password=form.password.data, email=form.email.data, fname=form.fname.data, lname=form.lname.data, profession=None, contact=None, about=None)
             db.session.add(newacc)
             db.session.commit()
             flash('Account has been created! You have now logged in!','success')
@@ -342,6 +342,7 @@ def event():
 @app.route("/event", methods=['GET', 'POST'])
 def dispevent():
     venues = Venue.query.all()
+    search = SearchForm()
     form = Participate()
     Autorejecter()
     participants = Participant.query.all()
@@ -353,7 +354,24 @@ def dispevent():
         db.session.commit()
         flash('Participant added.','success')
         return redirect('/event')
-    return render_template('dispevent.html', participants=participants, venues=venues, events=events, users=users, form=form, disps=disps)
+    return render_template('dispevent.html', participants=participants, venues=venues, events=events, users=users, form=form, disps=disps, search=search)
+
+@app.route("/eventanon", methods=['GET', 'POST'])
+def dispeventanon():
+    venues = Venue.query.all()
+    search = SearchForm()
+    form = Participate()
+    Autorejecter()
+    participants = Participant.query.all()
+    events = Events.query.filter_by(status='Approved')
+    users = User.query.all()
+    if form.validate_on_submit():
+        newparticipant = Participant(event=form.eventid.data, fname=form.fname.data, lname=form.lname.data, email=form.email.data, contact=form.contact.data)
+        db.session.add(newparticipant)
+        db.session.commit()
+        flash('Participant added.','success')
+        return redirect('/eventanon')
+    return render_template('anonymous.html', participants=participants, venues=venues, events=events, users=users, form=form, disps=disps, search=search)
 
 @app.route("/event/<int:id>/participants", methods=['GET'])
 def participantlist():
@@ -585,7 +603,7 @@ def deleteuser():
         db.session.delete(user)
         db.session.commit()
         flash('User has been deleted!','success')
-        return redirect(url_for('usermanage'))
+        return redirect(url_for('profile'))
 
 #//////////////////////////SV_CHEATS 1
 #The debugging routes.
