@@ -105,35 +105,32 @@ def changepass():
             flash('Your account has been updated!','success')
     return render_template('editprofile.html', form=form, user=user)
 
-@app.route("/search", methods=['GET', 'POST'])
+@app.route("/search/<string:query1>/by/<string:method>", methods=['GET', 'POST'])
 @login_required
-def results(search):
+def results(query1, method):
     results = []
-    search_string = search.data['search']
 
-    if search_string:
-        if search.data['select'] == 'Organizer': #if Searching for Organizer name(works with either searching first or last name)
-            qry = db.query(Events, User).filter(User.id==Events.organizer).filter(User.fname.contains(search_string))
-            qry2 = db.query(Events, User).filter(User.id==Events.organizer).filter(User.lname.contains(search_string))
+    if query1 != ' ':
+        if method == 'Organizer': #if Searching for Organizer name(works with either searching first or last name)
+            qry = db.session.query(Events, User).filter(User.id==Events.organizer).filter(User.fname.contains(query1)).filter(Events.status=='Approved')
+            qry2 = db.session.query(Events, User).filter(User.id==Events.organizer).filter(User.lname.contains(query1)).filter(Events.status=='Approved')
             qry3= qry.union(qry2)
             results = [item[0] for item in qry3.all()]
-        elif search.data['select'] == 'Event Title':
-            qry = db.query(Events).filter(Events.title.contains(search_string))
+        elif method == 'Event Title':
+            qry = db.session.query(Events).filter(Events.title.contains(query1)).filter(Events.status=='Approved')
             results = qry.all()
-        elif search.data['select'] == 'Event Tags':
-            qry = db.query(Events).filter(Events.tags.contains(search_string))
+        elif method == 'Event Tags':
+            qry = db.session.query(Events).filter(Events.tags.contains(query1)).filter(Events.status=='Approved')
             results = qry.all()
-        else:
-            qry = db.query(Events)
+    elif query1 == ' ':
+            qry = db.session.query(Events).filter(Events.status=='Approved')
             results = qry.all()
 
-        if not results:
-            flash('No results found!', 'search')
-            return redirect(url_for('profile'))
-        else:
-            table = Results(results)
-            table.border = True
-            return render_template('results.html', table=table)
+    if not results:
+        flash('No results found!', 'search')
+    table = Results(results)
+    table.border = True
+    return render_template('results.html', table=table)
 
 @app.route("/logout")
 @login_required
@@ -366,6 +363,13 @@ def dispevent():
     events = Events.query.filter_by(status='Approved')
     count = Events.query.filter_by(status='Approved').count()
     users = User.query.all()
+    if search.validate_on_submit():
+        if search.searchfor.data != None:
+            searchfor = search.searchfor.data
+        else:
+            searchfor = ' '
+        method = search.select.data
+        return redirect('/search/'+searchfor+'/by/'+method)
     if form.validate_on_submit():
         newparticipant = Participant(event=form.eventid.data, fname=form.fname.data, lname=form.lname.data, email=form.email.data, contact=form.contact.data)
         db.session.add(newparticipant)

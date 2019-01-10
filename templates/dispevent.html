@@ -39,7 +39,7 @@
               <div class="dropdown">
                 <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
                 <div class="dropdown-content">
-                <a href="#">Profile</a>
+                <a href="/profile">Profile</a>
                 <a href="/logout">Log Out</a>
               </div>
             </div>
@@ -55,22 +55,22 @@
 
       <!-- <search action="/search" method="POST">
         <div class="row">
-        {{search.hidden_tag()}}
-        {{search.search_id(class="search_input", placeholder="Search...")}}<BR>
-        {{search.submit(class="search_icon")}}
+
       </div>
     </search> -->
 
-    <search method="POST">
+    <form method="POST">
       <div class="container h-100">
         <div class="d-flex justify-content-center h-100">
           <div class="searchbar">
-            <input class="search_input" type="text" name="" placeholder="Search...Search...">
-            <a href="/search" class="search_icon" action="/search"><img src="{{ url_for('static', filename='images/loupe.png') }}"></a>
+              {{search.csrf_token}}
+              {{ search.select }}
+              {{search.searchfor( placeholder="Search...")}}<BR>
+              {{search.submit(class="search_icon")}}
           </div>
         </div>
       </div>
-    </search>
+    </form>
 
       <div class="container" style="padding-top: 50px;">
         <div class="row">

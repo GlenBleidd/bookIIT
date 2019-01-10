@@ -117,7 +117,9 @@ class Participate(FlaskForm):
     submit = SubmitField('Submit')
 
 class SearchForm(FlaskForm):
-    search_id = StringField('Search for Tags, Organizer, Event Title...',  validators = [InputRequired("Enter Student ID")])
+    choices = [('Organizer','Organizer'),( 'Event Title','Event Title'),('Event Tags','Event Tags')]
+    select = SelectField('Search for event:', choices=choices)
+    searchfor = StringField('')
     submit = SubmitField("Submit")
 
 class Results(Table):
@@ -127,6 +129,6 @@ class Results(Table):
     title = Col('Title')
     tags = Col('Tags')
     date_s = Col('Date Start')
-    time_s = Col('Time Start')
+    start = Col('Time Start')
     date_e = Col('Date End')
-    time_e = Col('Time End')
+    end = Col('Time End')
