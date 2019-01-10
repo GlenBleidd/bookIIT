@@ -60,7 +60,7 @@
 
               {% for venue in venues %}
               {% for college in colleges %}
-              {% if venues|selectattr('college','equalto',college.id)|list|length == 0 and college.id == venue.id %}
+              {% if venues|selectattr('college','equalto',college.id)|list|length == 0 and college.id == venue.college %}
                 <div class="col-md-4 col-sm-6" style="padding-top: 15px; padding-bottom: 15px;  ">
                   <div class="box8">
                       <img src="{{ url_for('static', filename='images/upload/'+ venue.image_file )}}">

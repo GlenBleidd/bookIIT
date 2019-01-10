@@ -94,6 +94,17 @@ def editprofile():
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     return render_template('editprofile.html', image_file=image_file, form=form, user=user)
 
+@app.route("/changepass", methods=['GET','POST'])
+@login_required
+def changepass():
+    user = User.query.filter_by(id=current_user.id).first()
+    form = Registration()
+    if form.validate_on_submit():
+            user.password = form.password.data
+            db.session.commit()
+            flash('Your account has been updated!','success')
+    return render_template('editprofile.html', form=form, user=user)
+
 @app.route("/search", methods=['GET', 'POST'])
 @login_required
 def results(search):
