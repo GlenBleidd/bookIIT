@@ -27,6 +27,7 @@ COLLEGEID = {
     10: 'PRISM'
 }
 
+
 class User(db.Model):
     __tablename__ = "user_acc"
     id = db.Column('acc_id', db.Integer , primary_key=True)
@@ -143,10 +144,121 @@ class College(db.Model):
     abb = db.Column('college_abb', db.String())
     img = db.Column('college_img', db.String(), nullable=False)
 
-    def __init__(self, name, abb):
-        self.id = id
+    def __init__(self, name, abb, img):
         self.name = name
         self.abb = abb
+        self.img = img
+
+def init_colleges():
+    is_existing = College.query.filter_by(id=1).first()
+    if is_existing == None:
+        newcollege = College(name='MSU-IIT', abb='MSU-IIT', img='IIT.jpg')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='MSU-IIT'
+        is_existing.abb='MSU-IIT'
+        is_existing.img='IIT.jpg'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=2).first()
+    if is_existing == None:
+        newcollege = College(name='College of Engineering', abb='COE', img='COET.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='College of Engineering'
+        is_existing.abb='COE'
+        is_existing.img='COET.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=3).first()
+    if is_existing == None:
+        newcollege = College(name='College of Science and Mathematics', abb='CSM', img='CSM.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='College of Science and Mathematics'
+        is_existing.abb='CSM'
+        is_existing.img='CSM.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=4).first()
+    if is_existing == None:
+        newcollege = College(name='College of Education', abb='CED', img='CED.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='College of Education'
+        is_existing.abb='CED'
+        is_existing.img='CED.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=5).first()
+    if is_existing == None:
+        newcollege = College(name='College of Arts and Social Science', abb='CASS', img='CASS.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='College of Arts and Social Science'
+        is_existing.abb='CASS'
+        is_existing.img='CASS.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=6).first()
+    if is_existing == None:
+        newcollege = College(name='College of Business Administration and Accountancy', abb='CBAA', img='CBAA.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='College of Business Administration and Accountancy'
+        is_existing.abb='CBAA'
+        is_existing.img='CBAA.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=7).first()
+    if is_existing == None:
+        newcollege = College(name='College of Nursing', abb='CON', img='nursing.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='College of Nursing'
+        is_existing.abb='CON'
+        is_existing.img='nursing.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=8).first()
+    if is_existing == None:
+        newcollege = College(name='School of Computer Studies', abb='SCS', img='SCS.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='School of Computer Studies'
+        is_existing.abb='SCS'
+        is_existing.img='SCS.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=9).first()
+    if is_existing == None:
+        newcollege = College(name='Integrated Developmental School', abb='IDS', img='IDS.png')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='Integrated Developmental School'
+        is_existing.abb='IDS'
+        is_existing.img='IDS.png'
+        db.session.commit()
+
+    is_existing = College.query.filter_by(id=10).first()
+    if is_existing == None:
+        newcollege = College(name='PRISM', abb='PRISM', img='PRISM.jpg')
+        db.session.add(newcollege)
+        db.session.commit()
+    else:
+        is_existing.name='PRISM'
+        is_existing.abb='PRISM'
+        is_existing.img='PRISM.jpg'
+        db.session.commit()
 
 class Events(db.Model):
     __tablename__ = "events"
@@ -161,7 +273,7 @@ class Events(db.Model):
     date_e = db.Column('event_date_end', db.Date())
     end = db.Column('event_time_end', db.Time())
     status = db.Column('event_status', db.String())
-    comment = db.column('event_comment', db.String())
+    comment = db.Column('event_comment', db.String())
     requestdate = db.Column('event_request_date', db.Date())
     image_file = db.Column('event_img', db.String(), nullable=False, default='defaultevents.jpg')
 

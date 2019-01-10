@@ -30,6 +30,7 @@ def save_picture(form_picture):
 
 @app.route("/index", methods=['GET','POST'])
 def login():
+    init_colleges()
     if current_user.is_authenticated:
         return redirect('/landing')
     else:
@@ -176,6 +177,7 @@ def login2():
 @app.route("/venue/manage", methods=['GET'])
 @login_required
 def venue():
+    init_colleges()
     venues = Venue.query.all()
     colleges = College.query.all()
     return render_template('venue.html', venues=venues, colleges=colleges)
@@ -248,8 +250,8 @@ def deletevenue(id):
         events = Events.query.filter_by(venue=venue.id)
         if venue != None:
             for event in events:
-                flash('NOTICE: An event has been removed because the venue of the event has become unavailable.','Notify'+str(event.organizer))
-                db.session.delete(event)
+                event.comment = event.comment + "Venue_Unavailable"
+                event.status = "Rejected"
                 db.session.commit()
             db.session.delete(venue)
             db.session.commit()
@@ -259,18 +261,6 @@ def deletevenue(id):
         return redirect(url_for('venue'))
 
 #///////////////////////////// EVENT
-def check_availability(date_s, date_e, start, end, venue): #returns true if available
-    events = Events.query.filter_by(venue=venue) #list all events in a venue
-    res = False
-    for event in events:
-        if event.status == 'Approved':
-            if event.date_s == event.date_e and event.date_s == date_s and date_e == 'None':#if event is 1 day, check if any overlapping times.
-                overlap = start < event.end and event.start < end
-            else:
-                overlap = date_s < event.date_e and event.date_s < date_e #if more than 1 day event, check if days intersect
-            res = res or overlap
-    return not res
-
 @app.route("/addevent", methods=['GET', 'POST'])
 @login_required
 def addevent():
@@ -298,6 +288,17 @@ def addevent():
             return redirect(url_for('profile'))
     return render_template('book.html', form=form, image_file=image_file)
 
+def check_availability(date_s, date_e, start, end, venue): #returns true if available
+    events = Events.query.filter_by(venue=venue) #list all events in a venue
+    res = False
+    for event in events:
+        if event.status == 'Approved':
+            if event.date_s == event.date_e and event.date_s == date_s and date_e == 'None':#if event is 1 day, check if any overlapping times.
+                overlap = start < event.end and event.start < end
+            else:
+                overlap = date_s < event.date_e and event.date_s < date_e #if more than 1 day event, check if days intersect
+            res = res or overlap
+    return not res
 disps = [
         { 'month':'Jan', 'color':'#781c2e', 'id':'January'},
         { 'month':'Feb', 'color':'#9966cc', 'id':'February'},
@@ -322,7 +323,7 @@ def Autorejecter():
             event.comment = 'Time has already lapsed. Please Rebook or Cancel this request.'
             db.session.commit()
 
-@app.route("/event/manage", methods=['GET'])
+@app.route("/event/manage", methods=['GET', 'POST'])
 @login_required
 def event():
     if not current_user.is_admin():
@@ -331,9 +332,14 @@ def event():
     else:
         form = EventReg()
         venues = Venue.query.all()
-        # events = Events.query.filter_by(status='Pending')
         events = Events.query.all()
         users = User.query.all()
+        if request.method == "POST":
+            eventid =  form.eventid.data
+            print eventid
+            comment = form.comment.data
+            print comment
+            return redirect('/event/'+str(eventid)+'/rejected/'+comment)
         return render_template('events.html', form=form, venues=venues, events=events, users=users)
 
 @app.route("/event", methods=['GET', 'POST'])
@@ -413,10 +419,6 @@ def editevent(id):
 def deleteevent(id):
     event = Events.query.filter_by(id=id).first()
     if event != None:
-        participantlist = Participant.query.filter_by(event=event.id)
-        for p in participantlist:
-            db.session.delete(p)    
-            db.session.commit()
         db.session.delete(event)
         db.session.commit()
         flash('Event has been deleted.','success')
@@ -437,15 +439,16 @@ def approveevent(id):
         flash('Your event has been approved!','Notify'+str(event.organizer))
         return redirect(url_for('event'))
 
-@app.route("/event/<int:id>/rejected", methods=['POST'])
+@app.route("/event/<int:id>/rejected/<string:data>", methods=['GET','POST'])
 @login_required
-def rejectedevent(id):
+def rejectedevent(id, data):
     if not current_user.is_admin():
         flash("You don't have permission to access this page.",'error')
         return redirect(url_for('venue'))
     else:
         event = Events.query.filter_by(id=id).first()
         event.status = 'Rejected'
+        event.comment = data
         db.session.commit()
         flash('Your event has been rejected! Please review it as soon as possible.','Notify'+str(event.organizer))
         return redirect(url_for('profile'))
@@ -518,18 +521,24 @@ def editadmin():
             flash('Email already exists. Please choose another.','error')
             return redirect(url_for('editprofile'))
         else:
+            #edit user details
             user.fname = form.fname.data
             user.lname = form.lname.data
             user.username = form.username.data
             user.email = form.email.data
             user.contact = form.contact.data
             db.session.commit()
+            #edit admin details
+            if admindetails == None:
+                newdetails=Admin_acc(id=user.id, faculty_id='MSU-IIT'+str(user.id), college=1, contact="+63Default")
+                db.session.add(newdetails)
+                db.session.commit()
             flash('Your account has been updated!','success')
             return redirect(url_for('profile'))
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     return render_template('editprofile.html', image_file=image_file, form=form, user=user)
 
-#(self, id, faculty_id, college, contact):
+#If admindetails == None: newdetails=Admin_acc(id=user.id, faculty_id='MSU-IIT'+str(user.id), college=1, contact="+63Default")
 #//////////////////////////ADMIN STUFF: MANAGE USERS
 
 @app.route("/manageusers", methods=['GET','POST'])
@@ -587,17 +596,17 @@ def deleteuser():
 #//////////////////////////SV_CHEATS 1
 #The debugging routes.
 
-@app.route("/toggleadmin") #toggles current_user's is_admin status
-def adminme():
-    user = User.query.filter_by(id=current_user.id).first()
-    if user == None:
-        return redirect('/login')
-    if user.type == 1:
-        user.type = 0
-    elif user.type == 0:
-        user.type = 1
-    db.session.commit()
-    return redirect('/landing')
+#@app.route("/toggleadmin") #toggles current_user's is_admin status
+#def adminme():
+#    user = User.query.filter_by(id=current_user.id).first()
+#    if user == None:
+#        return redirect('/login')
+#    if user.type == 1:
+#        user.type = 0
+#    elif user.type == 0:
+#        user.type = 1
+#    db.session.commit()
+#    return redirect('/landing')
 
 @app.route("/makedefaultadmins")#creates all the default admins.
 def makeadmins():

@@ -66,7 +66,7 @@ class AddVenue(FlaskForm):
 	equipment = TextAreaField('Equipment',
 							validators=[Optional()])
 	image_file = FileField('Update Picture',
-							validators=[FileAllowed(['jpg', 'png'])])
+							validators=[FileAllowed(['jpg', 'png']), DataRequired()])
 	submit = SubmitField('Add Venue')
 
 
@@ -89,7 +89,7 @@ class AddEvent(FlaskForm):
 	end = TimeField('End Time',
 							validators=[DataRequired()])
 	image_file = FileField('Event Poster',
-							validators=[FileAllowed(['jpg', 'png'])])
+							validators=[FileAllowed(['jpg', 'png']), DataRequired()])
 	submit = SubmitField('Request Event')
 
 class EventReg(FlaskForm):

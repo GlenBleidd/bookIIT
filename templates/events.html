@@ -105,7 +105,7 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
           </div>
           <div class="modal-body">
-                <form class="comment100-form-main validate-form" action="/event/{{event.id}}/rejected" method="post">
+                <form class="comment100-form-main validate-form" action="/event/manage" method="post">
                 {{ form.csrf_token }}
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
@@ -116,7 +116,7 @@
                         </ul>
                     {% endif %}
                 {% endwith %}
-              
+                    <p hidden="">{{ form.eventid(value=event.id) }}</p>
             <div class="wrap-input100-2 validate-input">    
                 {{ form.comment(class="comment100", placeholder="Please provide reason for rejection...", rows="6", cols="52") }}
             </div>
