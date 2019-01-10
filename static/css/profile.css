@@ -431,6 +431,8 @@ a {
 }
 
 .cardd.hovercard .avatar img {
+    background-size: cover;
+    background-position:center;
     width: 100px;
     height: 100px;
     max-width: 100px;

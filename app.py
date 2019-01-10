@@ -62,11 +62,12 @@ def profile():
     form = UpdateUser()
     accs = Admin_acc.query.all()
     colleges = College.query.all()
+    participants = Participant.query.all()
     users = User.query.filter_by(type=0)
     admins = User.query.filter_by(type=1)
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
     events = Events.query.all()
-    return render_template('profile.html', accs=accs, colleges=colleges, events=events, users=users, admins=admins, form=form, image_file=image_file)
+    return render_template('profile.html', participants=participants, accs=accs, colleges=colleges, events=events, users=users, admins=admins, form=form, image_file=image_file)
 
 @app.route("/settings", methods=['GET','POST'])
 @login_required
@@ -187,7 +188,9 @@ def venue():
 def dispvenue(id):
     venues = Venue.query.filter_by(college=id)
     colleges = College.query.all()
-    return render_template('dispvenue.html', venues=venues, colleges=colleges)
+    admins = Admin_acc.query.filter_by(college=id)
+    users = User.query.filter_by(type=1)
+    return render_template('dispvenue.html', venues=venues, admins=admins, users=users, colleges=colleges)
 
 @app.route("/venue-main", methods=['GET'])
 @login_required
@@ -306,7 +309,7 @@ disps = [
         { 'month':'April', 'color':'#cbe3f0', 'id':'April'},
         { 'month':'May', 'color':'#50c878', 'id':'May'},
         { 'month':'June', 'color':'#eae0c8', 'id':'June'},
-        { 'month':'July', 'color':'#e0115f', 'id':'July'},
+        { 'month':'July', 'color':'#80461b', 'id':'July'},
         { 'month':'Aug', 'color':'#e6e200', 'id':'August'},
         { 'month':'Sept', 'color':'#0f52ba', 'id':'September'},
         { 'month':'Oct', 'color':'#b297a0', 'id':'October'},

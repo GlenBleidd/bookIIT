@@ -76,13 +76,11 @@ class Admin_acc(db.Model):
     id = db.Column('admin_id', db.Integer)
     faculty_id = db.Column('iit_faculty_id', db.String(), primary_key=True)
     college = db.Column('admin_college', db.Integer)
-    contact = db.Column('admin_contact', db.String())
 
     def __init__(self, id, faculty_id, college, contact):
         self.id = id
         self.faculty_id = faculty_id
         self.college = COLLEGENAMES.get(college)
-        self.contact = contact
 
 def default_admins():  #makes default admins.
     for x in COLLEGEID:

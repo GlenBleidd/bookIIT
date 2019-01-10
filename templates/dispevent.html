@@ -50,17 +50,25 @@
     </nav>
 
     <section class="probootstrap-section">
+
+      <div class="container h-100">
+        <div class="d-flex justify-content-center h-100">
+          <div class="searchbar">
+            <input class="search_input" type="text" name="" placeholder="Search...">
+            <a href="/search" class="search_icon"><img src="{{ url_for('static', filename='images/loupe.png') }}"></a>
+          </div>
+        </div>
+      </div>
+
       <div class="container" style="padding-top: 50px;">
         <div class="row">
             {% for disp in disps %}
             <button class="tablink w3-animate-opacity" onclick="openPage('{{ disp.month }}', this, '{{ disp.color }}88')">{{ disp.month }}</button>
             {% endfor %}
             {% for disp in disps %}
-            <div id="{{ disp.month }}" class="tabcontent">
+            <div id="{{ disp.month }}" class="tabcontent" >
               {% for event in events|sort(attribute='date_s') %}
-              {% if disp.id == event.date_s.strftime("%B") %}
-            
-            
+              {% if event.status == 'Approved' and disp.id == event.date_s.strftime("%B") %}
             <ul class="event-list">
                 <li>
                     <time datetime="2014-07-20">
@@ -81,18 +89,21 @@
                         <p class="desc">{{ event.description| truncate(100, False) | safe }}</p>
                         <ul>
                             {% if event.organizer == current_user.id or current_user.is_admin() %}
-                            <li style="width:50%;" data-toggle="modal" data-target="#view{{ event.id }}"><img src="{{ url_for('static', filename='images/list.png') }}">View Participants </a></li>
+                            <li style="width:50%;" data-toggle="modal" data-target="#view{{ event.id }}"><img src="{{ url_for('static', filename='images/list.png') }}">View Participants </li>
                             {% elif event.organizer != current_user.id %}
-                            <li style="width:50%;" data-toggle="modal" data-target="#participate{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </a></li>
+                            <li style="width:50%;" data-toggle="modal" data-target="#participate{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </li>
                             {% endif %}
                             <li style="width:50%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
                         </ul>
                     </div>
-            </ul>    
-            
+            </ul>
+            <div class="row">
+              <img src="{{ url_for('static', filename='images/nothing.png') }}" style="width: 50%; margin: auto; border-radius: 1rem;">    
+            </div>
+            {% elif events|selectattr( 'date_s.strftime("%B")' ,'equalto', disp.month )|list|length == 0 %}
+             <img src="{{ url_for('static', filename='images/nooevents.png') }}" style="width: 100%; margin: auto; border-radius: 1rem;">
             {% endif %}
             {% endfor %}
-            <h3>No Events For Now</h3>
             </div>
             {% endfor %}
         </div>
@@ -166,7 +177,6 @@
           <div class="table-responsive">
               <table id="mytable" class="table table-bordred table-striped">
                <thead>
-
                  <th>First Name</th>
                  <th>Last Name</th>
                  <th>Email</th>
@@ -181,7 +191,7 @@
                     <td>{{p.lname}}</td>
                     <td>{{p.email}}</td>
                     <td>{{p.contact}}</td>
-                    <td><button action="/deleteparticipant/{{p.id}}" onclick="return confirm('Are you sure you want to delete this item?');"><img src="{{ url_for('static', filename='images/deleteuser.png') }}"></p></button></td>
+                    <td><button action="/deleteparticipant/{{p.id}}" onclick="return confirm('Are you sure you want to delete this item?');"><img src="{{ url_for('static', filename='images/deleteuser.png') }}"></button></td>
                     {% endif %}
                     {% endfor %}
                   </tr> 
