@@ -37,9 +37,9 @@ class User(db.Model):
     email = db.Column('email', db.String(), unique=True, index=True)
     fname = db.Column('fname', db.String())
     lname = db.Column('lname', db.String())
-    profession = db.column('profession', db.String())
-    contact = db.column('contact', db.String())
-    about = db.column('about', db.String())
+    profession = db.Column('profession', db.String())
+    contact = db.Column('contact', db.String())
+    about = db.Column('about', db.String())
     image_file = db.Column('img', db.String(), nullable=False, default='default.png')
 
     def __init__(self, username, password, email, fname, lname, profession, contact, about):
