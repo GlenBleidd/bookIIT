@@ -50,6 +50,16 @@
     </nav>
 
     <section class="probootstrap-section">
+
+      <div class="container h-100">
+        <div class="d-flex justify-content-center h-100">
+          <div class="searchbar">
+            <input class="search_input" type="text" name="" placeholder="Search...">
+            <a href="/search" class="search_icon"><img src="{{ url_for('static', filename='images/loupe.png') }}"></a>
+          </div>
+        </div>
+      </div>
+
       <div class="container" style="padding-top: 50px;">
         <div class="row">
             {% for disp in disps %}
