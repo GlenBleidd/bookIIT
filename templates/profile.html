@@ -81,7 +81,7 @@
                   </li>
                   {% endif %}
                   <li>
-                    <a class="tablinks" onclick="openCity(event, 'AccountSettings')"><img src="{{ url_for('static', filename='images/settings.png')}}">  Account Settings</a>
+                    <a href="/settings"><img src="{{ url_for('static', filename='images/settings.png')}}">  Account Settings</a>
                   </li>
                   <li>
                     <a class="tablinks" onclick="openCity(event, 'About')"><img src="{{ url_for('static', filename='images/about.png')}}">  About</a>
@@ -172,21 +172,22 @@
               </div>
 
               <div id="AccountSettings" class="tabcontent" style="padding-right: auto;">
-                <div class="row">
-                  <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}}); margin: 0px 2%; margin-left: 20%;">
-              </div>
+                
+
+
+                  <form class="form-horizontal" action="/profile" method="POST" enctype="multipart/form-data" role="form" style="width: 100%;padding-left: 25px;padding-right: 25px;">
+          
+                  <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}}); margin: auto;">
+                  </div>
                   <div class="venueform-wrap-2">
-                  {{ form.image_file.label() }}
-                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file, style="width: 100%") }}
+                  {{ form.image_file.label(style="margin-left:15px;") }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file, style="width: 96%;margin: auto;") }}
                         {% if form.image_file.errors %}
                           {% for error in form.image_file.errors %}
                             <span class="text-danger">{{ error }}</span>
                           {% endfor %}
                         {% endif %}
                   </div>
-
-
-                  <form class="form-horizontal" role="form" style="width: 100%;padding-left: 25px;padding-right: 25px;">
                     <div class="form-group">
                       <label class="col-lg-3 control-label">First name:</label>
                       <div class="col-lg-8" style="max-width: 100%;">
@@ -226,9 +227,7 @@
                     <div class="form-group">
                       <label class="col-md-3 control-label"></label>
                       <div class="col-md-8" style="max-width: 100%;">
-                        <input type="button" class="btn btn-primary" value="Save Changes">
-                        <span></span>
-                        <input type="reset" class="btn btn-default" value="Cancel">
+                        {{form.submit(class="btn btn=primary")}}
                       </div>
                     </div>
                   </form>
@@ -290,6 +289,7 @@
                     <p>{{ event.start.strftime("%I:%M %p") }} - {{ event.end.strftime("%I:%M %p") }}</p>
 
                     {% if event.status == 'Rejected' %}
+                    <span>Admin's Comment</span>
                     <p>{{ event.comment }}</p>
                     {% endif %}
 
@@ -303,15 +303,15 @@
                  <th>Contact</th>
                  <th>Delete</th>
                </thead>
+               {% for p in participants %}
+                  {% if p.event == event.id %}
                 <tbody>
                   <tr>
-                    {% for p in participants %}
-                    {% if p.event == event.id %}
                     <td>{{p.lname}}</td>
                     <td>{{p.fname}}</td>
                     <td>{{p.email}}</td>
                     <td>{{p.contact}}</td>
-                    <td><button action="/deleteparticipant/{{p.id}}" onclick="return confirm('Are you sure you want to delete this item?');"><img src="{{ url_for('static', filename='images/deleteuser.png') }}"></button></td>
+                    <td><a href="/deleteparticipant/{{p.id}}" onclick="return confirm('Are you sure you want to delete this item?');"><img src="{{ url_for('static', filename='images/deleteuser.png') }}"></a></td>
                     {% endif %}
                     {% endfor %}
                   </tr> 

@@ -32,77 +32,81 @@
 
       <div class="limiter">
         <div class="container-login100-2">
-          <div class="wrap-login100-2">
+          <div class="wrap-login100-2" style="height: 100%">
 
-            <form class="login100-form validate-form" action="/register" method="POST">
-                {{ form.csrf_token }}
+                  <form class="login100-form validate-form" action="/settings" method="POST" enctype="multipart/form-data" role="form" style="width: 100%;padding-left: 25px;padding-right: 25px;">
+                    {{form.csrf_token}}
+
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
-                        <ul class=flashes>
+                        <ul class="alert" style="color: #fff; background-color: #3c3b3bb3;" role="alert">
                             {% for message in messages %}
                                 <li>{{ message }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
                 {% endwith %}
-              <span class="login100-form-title ">
-                Sign Up For Free
-              </span>
-              <div class="row">
-                <div class="wrap-input100 validate-input" data-validate = "Enter Error Message">
-                  {{ form.fname.label(class="form-control-label") }}
-                  {{ form.fname(class="input100") }}
-                </div>
-              
-                <div class="wrap-input100 validate-input" data-validate = "Enter Error Message">
-                  {{ form.lname.label(class="form-control-label") }}
-                  {{ form.lname(class="input100") }}
-                </div>
-              </div>
-              
-              <div class="row">
-                <div class="wrap-input100 validate-input" data-validate = "Enter Error Message">
-                  {{ form.username.label(class="form-control-label") }}
-                  {{ form.username(class="input100") }}
-                </div>
-
-                <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-                  {{ form.email.label(class="form-control-label") }}
-                  {{ form.email(class="input100") }}
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="wrap-input100 validate-input" data-validate = "Enter Error Message">
-                  {{ form.password.label(class="form-control-label") }}
-                  {{ form.password(class="input100") }}
-                </div>
-
-                <div class="wrap-input100 validate-input" data-validate = "Enter Error Message">
-                  {{ form.confirm_password.label(class="form-control-label") }}
-                  {{ form.confirm_password(class="input100") }}
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="wrap-input100">  
-                  <span class="txt1">
-                    <br>
-                    Already have an Account?
-                  </span>
-                  <a class="txt2" href="/login">
-                    Log In.
-                  </a>
-                </div>
-              
-                <div class="wrap-input100">
-                  <br>
-                    <input type="submit" class="login100-form-btn" value="Create Account">
-                </div>
-              </div>
-
-            </form>
-            </div>
+                {% if form.errors %}
+                          {% for error in form.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                  
+                  <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}}); margin: auto;">
+                  </div>
+                  <div class="venueform-wrap-2" style="margin-left: 0px">
+                  {{ form.image_file.label(style="margin-left:15px;") }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file, style="width: 96%;margin: auto;") }}
+                        {% if form.image_file.errors %}
+                          {% for error in form.image_file.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">First name:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.fname(class="form-control pb_height-50 reverse" , placeholder="First Name", value=current_user.fname) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Last name:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.lname(class="form-control pb_height-50 reverse" , placeholder="Last Name", value=current_user.lname) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Email:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.email(class="form-control pb_height-50 reverse" , placeholder="Email", value=current_user.email) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Contact:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.contact(class="form-control pb_height-50 reverse" , placeholder="Contact Number", value=current_user.contact) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Profession:</label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{ form.profession(class="form-control pb_height-50 reverse" , placeholder="Profession", value=current_user.profession) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">About:</label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{ form.bio(class="form-control pb_height-50 reverse" , placeholder="Say something about yourself.") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label"></label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{form.submit(class="btn btn=primary")}}
+                      </div>
+                    </div>
+                  </form>
+          </div>
         </div>
       </div>  
     </section>

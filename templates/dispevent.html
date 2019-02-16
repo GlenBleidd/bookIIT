@@ -47,7 +47,10 @@
           </ul>
               Logged in as {{current_user.fname}}
         </div>
+          {% elif current_user.is_anonymous %}
+            <a href="/register" class="btn btn-info" style="margin-left: auto; ">Create Account</a>
           {% endif %}
+          
       </div>
     </nav>
 
@@ -62,12 +65,14 @@
     <form method="POST">
       <div class="container h-100">
         <div class="d-flex justify-content-center h-100">
-          <div class="searchbar">
+          
               {{search.csrf_token}}
-              {{ search.select }}
-              {{search.searchfor( placeholder="Search...")}}<BR>
-              {{search.submit(class="search_icon")}}
-          </div>
+              <div class="searchbar">
+                {{ search.select(class="search_input") }}
+                {{search.searchfor(class="search_input",style="padding: 0 10px; width: 300px; caret-color: red; transition: width 0.4s linear;", placeholder="Search...")}}
+                <a>{{search.submit(class="search_icon", style="background-image: url(../static/images/loupe.png); background-position:center; background-size: 24px; background-repeat: no-repeat;")}}</a>
+              </div>
+          
         </div>
       </div>
     </form>
@@ -80,17 +85,13 @@
             {% for disp in disps %}
             <div id="{{ disp.month }}" class="tabcontent" >
               {% for event in events|sort(attribute='date_s') %}
-              {% if count > 1 and disp.id == event.date_s.strftime("%B") %}
+              {% if event.status == 'Approved' and disp.id == event.date_s.strftime("%B") %}
               <ul class="event-list">
-                
-                {{event.date_s.strftime("%B")}}
-                {{disp.id}}
-                {{events|selectattr( 'date_s.strftime("%B")' ,'equalto', disp.id )|list|length == 0}}
                 <li>
                     <time datetime="2014-07-20">
-                        {% if event.date_e is none %}
+                        {% if event.date_e == event.date_s %}
                             <span class="day" style="padding-bottom: 15px;">{{ event.date_s.strftime("%d") }}</span>
-                        {% elif event.date_e is not none %}
+                        {% elif event.date_e > event.date_s %}
                             <span class="days" >{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
                         {% endif %}
                         <span class="month">{{ event.start.strftime("%H:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
@@ -106,22 +107,17 @@
                         <ul>
                             {%  if current_user.is_authenticated%}
                             {% if event.organizer == current_user.id or current_user.is_admin() %}
-                            <li style="width:50%;" data-toggle="modal" data-target="#view{{ event.id }}"><img src="{{ url_for('static', filename='images/list.png') }}">View Participants </li>
+                            <li style="width:33 %;" data-toggle="modal" data-target="#view{{ event.id }}"><img src="{{ url_for('static', filename='images/list.png') }}">View Participants </li>
+                            <li style="width:33%;" data-toggle="modal" data-target="#participate{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </li>
                             {% elif event.organizer != current_user.id or current_user.is_anonymous() %}
                             <li style="width:50%;" data-toggle="modal" data-target="#participate{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </li>
                             {% endif %}
                                 {% endif %}
-                            <li style="width:50%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
+                            <li style="width:40%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
                         </ul>
                     </div>
                   </li>
-                
-                <div class="row">
-                  <img src="{{ url_for('static', filename='images/nothing.png') }}" style="width: 50%; margin: auto; border-radius: 1rem;">    
-                </div>
-            </ul>
-            {% elif count == 0 and disp.id == event.date_s.strftime("%B") %}
-             <img src="{{ url_for('static', filename='images/nooevents.png') }}" style="width: 100%; margin: auto; border-radius: 1rem;">
+                </ul>
             {% endif %}
             {% endfor %}
             </div>

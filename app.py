@@ -74,24 +74,21 @@ def profile():
 def editprofile():
     user = User.query.filter_by(id=current_user.id).first()
     form = UpdateUser()
-    if form.validate_on_submit():
-        #if username/email is already used
-        if User.query.filter_by(username=form.username.data).first():
-            flash('Username already exists. Please choose another.','error')
-            return redirect(url_for('editprofile'))
-        if User.query.filter_by(email=form.email.data).first():
-            flash('Email already exists. Please choose another.','error')
-            return redirect(url_for('editprofile'))
-        else:
-            user.fname = form.fname.data
-            user.lname = form.lname.data
-            user.username = form.username.data
-            user.email = form.email.data
-            user.contact = form.contact.data
-            db.session.commit()
-            flash('Your account has been updated!','success')
-            return redirect(url_for('profile'))
     image_file = url_for('static', filename='images/upload/' + current_user.image_file)
+    if form.validate_on_submit():
+        if form.image_file.data: #if change in picture, replace picture. otherwise, stay the same
+            picture_file = save_picture(form.image_file.data)
+            user.image_file = picture_file
+        user.fname = form.fname.data
+        user.lname = form.lname.data
+        user.email = form.email.data
+        user.contact = form.contact.data
+        user.profession = form.profession.data
+        user.about = form.bio.data
+        db.session.commit()
+        flash('Your account has been updated!','success')
+        return redirect(url_for('profile'))
+    
     return render_template('editprofile.html', image_file=image_file, form=form, user=user)
 
 @app.route("/changepass", methods=['GET','POST'])
@@ -619,7 +616,7 @@ def edituser():
 
 @app.route("/user/<int:id>/delete", methods=['GET','POST'])
 @login_required
-def deleteuser():
+def deleteuser(id):
     if not current_user.is_admin():
         flash("You don't have permission to access this page.",'error')
         return redirect(url_for('profile'))
@@ -633,17 +630,17 @@ def deleteuser():
 #//////////////////////////SV_CHEATS 1
 #The debugging routes.
 
-#@app.route("/toggleadmin") #toggles current_user's is_admin status
-#def adminme():
-#    user = User.query.filter_by(id=current_user.id).first()
-#    if user == None:
-#        return redirect('/login')
-#    if user.type == 1:
-#        user.type = 0
-#    elif user.type == 0:
-#        user.type = 1
-#    db.session.commit()
-#    return redirect('/landing')
+@app.route("/toggleadmin") #toggles current_user's is_admin status
+def adminme():
+    user = User.query.filter_by(id=current_user.id).first()
+    if user == None:
+        return redirect('/login')
+    if user.type == 1:
+        user.type = 0
+    elif user.type == 0:
+        user.type = 1
+    db.session.commit()
+    return redirect('/landing')
 
 @app.route("/makedefaultadmins")#creates all the default admins.
 def makeadmins():

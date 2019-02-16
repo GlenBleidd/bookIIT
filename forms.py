@@ -30,18 +30,16 @@ class Registration(FlaskForm):
 
 class UpdateUser(FlaskForm):
 	fname = StringField('First Name',
-							validators=[InputRequired(), Length(min=2, max=20)])
+							validators=[DataRequired(), Length(min=2, max=20)])
 	lname = StringField('Last Name',
-							validators=[InputRequired(), Length(min=2, max=20)])
-	username = StringField('Username',
-							validators=[InputRequired(), Length(min=5, max=16)])
+							validators=[DataRequired(), Length(min=2, max=20)])
 	email = StringField('Email',
-							validators=[InputRequired(), Email()])
+							validators=[DataRequired(), Email()])
 	profession = StringField('Profession',
 							validators=[Optional()])
 	bio = TextAreaField('Bio',
 							validators=[Optional()])
-	contact = IntegerField('Contact',
+	contact = StringField('Contact',
 							validators=[Optional()])
 	image_file = FileField('Update Picture',
 							validators=[FileAllowed(['jpg', 'png'])])
@@ -120,7 +118,7 @@ class SearchForm(FlaskForm):
     choices = [('Organizer','Organizer'),( 'Event Title','Event Title'),('Event Tags','Event Tags')]
     select = SelectField('Search for event:', choices=choices)
     searchfor = StringField('')
-    submit = SubmitField("Submit")
+    submit = SubmitField("")
 
 class Results(Table):
     id = Col('Id', show= False)

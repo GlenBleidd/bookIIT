@@ -47,14 +47,13 @@
             {% if event.status == 'Pending' and events|selectattr('status','equalto','Pending')|list|length != 0 %}
             <ul class="event-list">
                 <li>
-                    <time datetime="2014-07-20">
-                        <span class="month">{{ event.date_s.strftime("%b") }} {{ event.date_s.strftime("%Y") }}</span>
-                        {% if event.date_e is none %}
-                        <span class="day">{{ event.date_s.strftime("%d") }}</span>
-                        {% elif event.date_e is not none %}
-                        <span class="days">{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
+                     <time datetime="2014-07-20">
+                        {% if event.date_e == event.date_s %}
+                            <span class="day" style="padding-bottom: 15px;">{{ event.date_s.strftime("%d") }}</span>
+                        {% elif event.date_e > event.date_s %}
+                            <span class="days" >{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
                         {% endif %}
-                        <span class="time">{{ event.start.strftime("%I:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
+                        <span class="month">{{ event.start.strftime("%H:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
                     </time>
                     <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}">
                     <div class="info">
@@ -64,9 +63,12 @@
                         </div>
                         {% for user in users %}
                         {% if user.id == event.organizer %}
-                        <p class="desc">{{ user.fname + ' ' + user.lname }}</p>
+                        <p class="desc">Organizer: {{ user.fname + ' ' + user.lname }}</p>
                         {%endif%}{%endfor%}
-                        <p class="desc">{{ event.description }}</p>
+                        <p class="desc">Date Requested: {{ event.requestdate }}</p>
+                        <ul>
+                            <li style="width:40%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
+                        </ul>
                     </div>
                     <div class="social">
                         <ul>
@@ -92,44 +94,51 @@
     </section>
 
     {% for event in events %}
-    <div id="modEvent{{event.id}}" class="modal fade" role="dialog">
-      <div class="modal-dialog">
+    {% for venue in venues %}
+    <div id="event{{ event.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog" style="max-width: 75%;">
 
-        <!-- Modal content -->
-        <div class="modal-content">
-          <div class="modal-header">
-            <span class="row">
-                Comments/Suggestion
-            </span>
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="product-title">{{ event.title }}</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      
+              
+    <div class="card">
+      <div class="container-fliud">
+        <div class="wrapper row">
+          <div class="preview col-md-6">
+            
+            <div class="preview-pic tab-content">
+              <div class="tab-pane active" id="pic-1"><img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" /></div>
+            </div>
           </div>
-          <div class="modal-body">
-                <form class="comment100-form-main validate-form" action="/event/manage" method="post">
-                {{ form.csrf_token }}
-                {% with messages = get_flashed_messages() %}
-                    {% if messages %}
-                        <ul class=flashes>
-                            {% for message in messages %}
-                                <li>{{ message }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endwith %}
-                    <p hidden="">{{ form.eventid(value=event.id) }}</p>
-            <div class="wrap-input100-2 validate-input">    
-                {{ form.comment(class="comment100", placeholder="Please provide reason for rejection...", rows="6", cols="52") }}
+          <div class="details col-md-6">
+            <h3 class="product-title">Details</h3>
+            <div class="rating">
+              {% if event.date_e == event.date_s %}
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d, %Y")  }}</span>  
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              {% elif event.date_e > event.date_s %}
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d") }} - {{ event.date_e.strftime("%d, %Y") }} </span>
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              {% endif %}
             </div>
-            <br>
-            <div class="wrap-input100-2 validate-input">
-            {{ form.submit(class="login100-form-btn", style="width: 67%") }}
-            </div>
-
-            </form>
+            <span class="review-no"><img src="{{ url_for('static', filename='images/pin.png') }}">{{ venue.name }}</span>
+            <p class="product-description">{{ event.description }}</p>
+            <h4 class="price">Tags</h4>
+            <p class="vote"><strong>{{ event.tags }}</strong></p>
           </div>
         </div>
       </div>
     </div>
-    {%endfor%}
+    </div>
+  </div>
+</div>
+   {% endfor %}
+    {% endfor %}
 
 
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
