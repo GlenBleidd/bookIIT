@@ -25,9 +25,9 @@
 
         <div class="collapse navbar-collapse" id="probootstrap-nav">
           <ul class="navbar-nav ml-auto">
-            <!-- <li class="nav-item"><a href="" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li> -->
+            <li class="nav-item"><a href="/event" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
             <div class="dropdown">
-                <button class="dropbtn"><img src="{{ url_for('static', filename='images/dog.png') }}" width="60" height="60";"></button>
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
                 <div class="dropdown-content">
                 <a href="#">Profile</a>
                 <a href="/logout">Log Out</a>
@@ -45,8 +45,7 @@
           <div class="col-md-3">
             <div class="profile-sidebar">
               <!-- SIDEBAR USERPIC -->
-              <div class="profile-userpic">
-                <img src="{{ url_for('static', filename='images/dog.png') }}">
+              <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}});">
               </div>
               <!-- END SIDEBAR USERPIC -->
               <!-- SIDEBAR USER TITLE -->
@@ -63,50 +62,276 @@
               <div class="profile-userbuttons">
                 <!-- <button type="button" class="btn btn-success btn-sm">Create Event</button> -->
                 <a href="/addevent" class="btn btn-success btn-sm">Create Event</a>
+                <br>
+                or
+                <br>
+                <a href="/venue-main" class="btn btn-info btn-sm">Browse Venues</a>
               </div>
               <!-- END SIDEBAR BUTTONS -->
               <!-- SIDEBAR MENU -->
+
               <div class="profile-usermenu">
                 <ul>
-                  <li class="active">
-                    <a href="#">
-                    <!-- <i class="glyphicon glyphicon-home"></i> -->
-                    Calendar </a>
+                  <li>
+                    <a class="tablinks" onclick="openCity(event, 'Events')" id="defaultOpen"><img src="{{ url_for('static', filename='images/minicalendar.png')}}">  My Events</a>
+                  </li>
+                  {% if current_user.is_admin() %}
+                  <li>
+                    <a class="tablinks" onclick="openCity(event, 'ManageUsers')"><img src="{{ url_for('static', filename='images/group.png')}}">  Manage Users</a>
+                  </li>
+                  {% endif %}
+                  <li>
+                    <a href="/settings"><img src="{{ url_for('static', filename='images/settings.png')}}">  Account Settings</a>
                   </li>
                   <li>
-                    <a href="#">
-                    <!-- <i class="glyphicon glyphicon-user"></i> -->
-                    Account Settings </a>
-                  </li>
-                  <li>
-                    <a href="#" target="_blank">
-                    <!-- <i class="glyphicon glyphicon-ok"></i> -->
-                    Tasks </a>
-                  </li>
-                  <li>
-                    <a href="#">
-                    <!-- <i class="glyphicon glyphicon-flag"></i> -->
-                    Help </a>
+                    <a class="tablinks" onclick="openCity(event, 'About')"><img src="{{ url_for('static', filename='images/about.png')}}">  About</a>
                   </li>
                 </ul>
               </div>
               <!-- END MENU -->
             </div>
           </div>
+
           <div class="col-md-9">
-                  <div class="profile-content">
-                    <div id="calendar"></div>
+              <div id="Events" class="tabcontent">
+                <div class="row">
+                  {%  for event in events | sort(attribute='date_s') %}
+                  {% if event.organizer == current_user.id %}
+                    {% if event.status == 'Approved' %}
+                    <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                        <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                        <div class="card-body" style="background-color: #b2f977">
+                          <p hidden>{{ event.event_id }}</p>
+                          <h5 class="card-title">{{ event.title }}</h5>
+                          <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                        </div>
+                    </div>
+                    {% elif event.status == 'Rejected' %}
+                    <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                        <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                        <div class="card-body" style="background-color: #f97f66">
+                          <p hidden>{{ event.event_id }}</p>
+                          <h5 class="card-title">{{ event.title }}</h5>
+                          <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                        </div>
+                    </div>
+                    {% elif event.status == 'Pending' %}
+                    <div class="card" style="width: 30%; margin-left: 13px; margin-right: 13px; margin-bottom: 15px;">
+                        <img class="card-img-top" src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" alt="Card image cap">
+                        <div class="card-body" style="background-color: #777777">
+                          <p hidden>{{ event.event_id }}</p>
+                          <h5 class="card-title">{{ event.title }}</h5>
+                          <a class="btn2 btn2-primary" data-toggle="modal" data-target="#event{{ event.id }}">More Info</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                  {% elif events|selectattr('organizer','equalto', current_user.id )|list|length == 0 %}
+                    <!-- {% if event.status == 'PH' %} -->
+                    <img src="{{ url_for('static', filename='images/noevents.png') }}" style="width: 80%; margin: auto; margin-top: 70px; border-radius: 1rem;">
+                    <!-- {% endif %} -->
+                  {% endif %}
+                  {% endfor %}
+                </div>
+              </div>
+
+              <div id="ManageUsers" class="tabcontent">
+                <div class="row">
+                  <div class="table-responsive">
+                        <table class="table user-list">
+                            <thead>
+                                <tr>
+                                <th><span>User</span></th>
+                                <th><span>Email</span></th>
+                                <th><span>Action</span></th>
+                                <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                              {% for user in users %}
+                                
+                                <tr>
+                                    <td>
+                                        <img src="{{ url_for('static', filename='images/upload/'+ user.image_file )}}">
+                                        <a href="#" class="user-link">{{ user.fname + ' ' + user.lname }}</a>
+                                        <span class="user-subhead">{{ user.username }}</span>
+                                    </td>
+
+                                    <td>
+                                        <a href="#">{{ user.email }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="/user/{{user.id}}/delete" onclick="return confirm('Are you sure you want to delete {{user.fname + ' ' + user.lname}}?');"><img src="{{ url_for('static', filename='images/deleteuser.png')}}"> Delete</a>
+                                    </td>
+                                </tr>
+                                
+                              {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+              </div>
+
+              <div id="AccountSettings" class="tabcontent" style="padding-right: auto;">
+                
+
+
+                  <form class="form-horizontal" action="/profile" method="POST" enctype="multipart/form-data" role="form" style="width: 100%;padding-left: 25px;padding-right: 25px;">
+          
+                  <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}}); margin: auto;">
                   </div>
+                  <div class="venueform-wrap-2">
+                  {{ form.image_file.label(style="margin-left:15px;") }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file, style="width: 96%;margin: auto;") }}
+                        {% if form.image_file.errors %}
+                          {% for error in form.image_file.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">First name:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.fname(class="form-control pb_height-50 reverse" , placeholder="First Name", value=current_user.fname) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Last name:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.lname(class="form-control pb_height-50 reverse" , placeholder="Last Name", value=current_user.lname) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Email:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.email(class="form-control pb_height-50 reverse" , placeholder="Email", value=current_user.email) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Contact:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.contact(class="form-control pb_height-50 reverse" , placeholder="Contact Number", value=current_user.contact) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Profession:</label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{ form.profession(class="form-control pb_height-50 reverse" , placeholder="Profession", value=current_user.profession) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">About:</label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{ form.bio(class="form-control pb_height-50 reverse" , placeholder="Say something about yourself.") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label"></label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{form.submit(class="btn btn=primary")}}
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+
+              <div id="About" class="tabcontent" style="padding-right: auto;">
+                <div class="row">
+                  {% for admin in admins|sort(attribute='id') %}
+                  {% for acc in accs %}
+                  {% for college in colleges %}
+                  {% if admin.id == acc.id and acc.college == college.id %}
+                  <div class="col-lg-3 col-sm-6" style="max-width: 33%;">
+
+                    <div class="cardd hovercard" style="height: 350px;margin-bottom: 20px;border-radius: 20px;">
+                        <div class="cardheader" style="background-image: url(../static/images/colleges/{{college.img}}); background-position: center;">
+
+                        </div>
+                        <div class="avatar" style="background-image: url(../static/images/upload/{{admin.image_file}}); margin-top: -15px;">
+                        </div>
+                        <div class="info" style="margin-top: -50px;">
+                            <div class="title">
+                                <a target="_blank" href="https://scripteden.com/">{{admin.fname + ' ' + admin.lname}}</a>
+                            </div>
+                            <div class="desc">{{ college.abb }}</div>
+                            <div class="desc">{{ admin.email }}</div>
+                            <div class="desc">{{ admin.contact }} {{ admin.id }}</div>
+                            <div class="desc">telephone#</div>
+                        </div>
+                    </div>
+                  </div>
+                  {% endif %}
+                  {% endfor %}
+                  {% endfor %}
+                  {% endfor %}
+
+
+
+                </div>
+              </div>
+
           </div>
         </div>
       </div>
     </section>
 
+    {% for event in events %}
+        <div id="event{{ event.id }}" class="modal fade" role="dialog">
+            <div class="modal-dialog" style="max-width: 50%;">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h4 class="modal-title">{{ event.title }}</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  </div>
+                  <div class="modal-body2">
+                    <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" style="max-width: 100%">
+                    <p style="white-space: pre-line;">{{ event.description }}</p>
+                    <p>{{ event.date_s.strftime("%d-%B-%Y") }}</p>
+                    <p>{{ event.start.strftime("%I:%M %p") }} - {{ event.end.strftime("%I:%M %p") }}</p>
+
+                    {% if event.status == 'Rejected' %}
+                    <span>Admin's Comment</span>
+                    <p>{{ event.comment }}</p>
+                    {% endif %}
+
+                  </div>
+                  <div class="table-responsive">
+              <table id="mytable" class="table table-bordred table-striped">
+               <thead>
+                 <th>Last Name</th>
+                 <th>First Name</th>
+                 <th>Email</th>
+                 <th>Contact</th>
+                 <th>Delete</th>
+               </thead>
+               {% for p in participants %}
+                  {% if p.event == event.id %}
+                <tbody>
+                  <tr>
+                    <td>{{p.lname}}</td>
+                    <td>{{p.fname}}</td>
+                    <td>{{p.email}}</td>
+                    <td>{{p.contact}}</td>
+                    <td><a href="/deleteparticipant/{{p.id}}" onclick="return confirm('Are you sure you want to delete this item?');"><img src="{{ url_for('static', filename='images/deleteuser.png') }}"></a></td>
+                    {% endif %}
+                    {% endfor %}
+                  </tr> 
+                </tbody>
+              </table>
+            </div>
+                  <div class="modal-footer">
+                    
+                    <!-- <button type="button" action="" class="btn2 btn2-default" style="background-color: #00ff00">Edit</button> -->
+                    <a href="/deleteevent/{{event.id}}" onclick="return confirm('Are you sure you want to delete this item?');" class="btn btn-danger btn-sm">Delete</a>
+                  </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/moment.min.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/clock.js') }}"></script>
   </body>
 </html>

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Landing</title>
+    <title>BookIIT - Admin</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+ 
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>   
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
@@ -22,9 +23,9 @@
 
         <div class="collapse navbar-collapse" id="probootstrap-nav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a href="" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
+            <li class="nav-item"><a href="/event" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
             <div class="dropdown">
-                <button class="dropbtn"><img src="{{ url_for('static', filename='images/user.png') }}"></button>
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
                 <div class="dropdown-content">
                 <a href="/profile">Profile</a>
                 <a href="/logout">Log Out</a>
@@ -32,7 +33,7 @@
             </div>
 
           </ul>
-            Logged in as {{current_user.username}}
+            Logged in as {{current_user.fname}}
         </div>
       </div>
     </nav>
@@ -43,7 +44,7 @@
           <div class="col-md pl-md-3 pl-0 probootstrap-image-grid">
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <ul class=flashes>
+                    <ul class="alert alert-secondary" role="alert" style="color: #464a4e;background-color: #5ffc6b;text-align: center;">
                         {% for message in messages %}
                             <li>{{ message }}</li>
                         {% endfor %}
@@ -52,13 +53,13 @@
             {% endwith %}
             <div class="row">
               <div class="col-md-6">
-                <a class="probootstrap-img-item" href=""><div style="background-image: url(../static/images/obama.jpg); background-position: center;"></div></a>
+                <a class="probootstrap-img-item" href="/event/manage"><div style="background-image: url(../static/images/obama.jpg); background-position: center;"></div></a>
                 <div class="texttest">
                   <p>Manage Events</p>
                 </div>
               </div>
               <div class="col-md-6">
-                <a class="probootstrap-img-item" href="/venue"><div style="background-image: url(../static/images/office.jpg); background-position: center;"></div></a>
+                <a class="probootstrap-img-item" href="/venue/manage"><div style="background-image: url(../static/images/office.jpg); background-position: center;"></div></a>
                 <div class="texttest">
                   <p>Manage Venues</p>
                 </div>

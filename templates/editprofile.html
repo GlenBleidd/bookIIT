@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Register</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formsmain.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formsutil.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    
+  
+  </head>
+  
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark probootstrap-navabr-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/index"><img src="{{ url_for('static', filename='images/logo.png') }}" width="150" height="75"></a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#probootstrap-nav" aria-controls="probootstrap-nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+    </nav>
+
+     
+    <section class="probootstrap-cover">
+
+      <div class="limiter">
+        <div class="container-login100-2">
+          <div class="wrap-login100-2" style="height: 100%">
+
+                  <form class="login100-form validate-form" action="/settings" method="POST" enctype="multipart/form-data" role="form" style="width: 100%;padding-left: 25px;padding-right: 25px;">
+                    {{form.csrf_token}}
+
+                {% with messages = get_flashed_messages() %}
+                    {% if messages %}
+                        <ul class="alert" style="color: #fff; background-color: #3c3b3bb3;" role="alert">
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endwith %}
+                {% if form.errors %}
+                          {% for error in form.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                  
+                  <div class="profile-userpic" style="background-image: url(../static/images/upload/{{current_user.image_file}}); margin: auto;">
+                  </div>
+                  <div class="venueform-wrap-2" style="margin-left: 0px">
+                  {{ form.image_file.label(style="margin-left:15px;") }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=current_user.image_file, style="width: 96%;margin: auto;") }}
+                        {% if form.image_file.errors %}
+                          {% for error in form.image_file.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+                  </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">First name:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.fname(class="form-control pb_height-50 reverse" , placeholder="First Name", value=current_user.fname) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Last name:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.lname(class="form-control pb_height-50 reverse" , placeholder="Last Name", value=current_user.lname) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Email:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.email(class="form-control pb_height-50 reverse" , placeholder="Email", value=current_user.email) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-lg-3 control-label">Contact:</label>
+                      <div class="col-lg-8" style="max-width: 100%;">
+                        {{ form.contact(class="form-control pb_height-50 reverse" , placeholder="Contact Number", value=current_user.contact) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">Profession:</label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{ form.profession(class="form-control pb_height-50 reverse" , placeholder="Profession", value=current_user.profession) }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label">About:</label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{ form.bio(class="form-control pb_height-50 reverse" , placeholder="Say something about yourself.") }}
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label class="col-md-3 control-label"></label>
+                      <div class="col-md-8" style="max-width: 100%;">
+                        {{form.submit(class="btn btn=primary")}}
+                      </div>
+                    </div>
+                  </form>
+          </div>
+        </div>
+      </div>  
+    </section>
+
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/formsmain.js') }}"></script>
+
+
+  </body>
+</html>

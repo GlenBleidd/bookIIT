@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Landing</title>
+    <title>Venue - Edit</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
@@ -23,9 +24,9 @@
 
         <div class="collapse navbar-collapse" id="probootstra-nav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a href="" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
+            <li class="nav-item"><a href="/event" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
             <div class="dropdown">
-                <button class="dropbtn"><img src="{{ url_for('static', filename='images/user.png') }}"></button>
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
                 <div class="dropdown-content">
                 <a href="/profile">Profile</a>
                 <a href="#">Preferences</a>
@@ -33,7 +34,7 @@
               </div>
             </div>
           </ul>
-            Logged in as {{current_user.username}}
+            Logged in as {{current_user.fname}}
         </div>
       </div>
     </nav>
@@ -41,20 +42,20 @@
     <section class="probootstrap-cover">
       <div class="limiter">
         <div class="container-login100-2">
-          <div class="wrap-venue100">
+          <div class="wrap-venue100" style="margin-top: 60px; margin-bottom: 60px;">
 
-            <form class="login100-form validate-form" action="/editvenue/{{ venue.id }}" method="POST">
+<form class="login100-form validate-form" action="/editvenue/{{venue.id}}" method="POST" enctype="multipart/form-data">
                 {{ form.csrf_token }}
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
-                        <ul class=flashes>
+                        <ul class="alert" style="color: #fff; background-color: #3c3b3bb3;" role="alert">
                             {% for message in messages %}
                                 <li>{{ message }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
                 {% endwith %}
-              <span class="login100-form-title-2">
+              <span class="login100-form-title-2" style="padding-bottom: 10px;">
                 Edit Venue
               </span>
 
@@ -70,58 +71,55 @@
 
               <div class="row">
                 <div class="venueform-wrap">
-                  {{ form.name(class="form-control pb_height-50 reverse", placeholder="Venue Name", value=venue.name) }}
+                  {{ form.name(class="form-control pb_height-50 reverse", placeholder="Venue Name", value=venue.name ) }}
                 </div>
 
                 <div class="venueform-wrap">
-                {{ form.capacity(class="form-control pb_height-50 reverse", placeholder="Capacity", value=venue.capacity) }}
+                {{ form.capacity(class="form-control pb_height-50 reverse", placeholder="Capacity", value=venue.capacity ) }}
                 </div>
-
+                
               </div>
 
               <div class="row">
                 <div class="venueform-wrap">
-                  {{ form.college(class="form-control pb_height-50 reverse", placeholder="College", id='college') }}
+                  {{ form.college(class="form-control pb_height-50 reverse", placeholder="College", value=venue.college ) }}
                 </div>
-                  <script>document.getElementByID("college_id").selectedIndex = "{{ venue.college + 1}}";</script>
+              
                 <div class="venueform-wrap">
-                  {{ form.rate(class="form-control pb_height-50 reverse", placeholder="Rate (Php/hr)", value=venue.rate) }}
+                  {{ form.rate(class="form-control pb_height-50 reverse", placeholder="Rate (Php/hr)", value=venue.rate ) }}
                 </div>
               </div>
+
               
               <div class="row">
                 <span class="venue-txt">
-                  If others, please specify:
+                  Equipments:
                 </span>
-
-                <span class="venue-txt2">
-                Equipments:
-              </span>
               </div>
-                
-                <div class="venueform-wrap">
-                  {{ form.equipment(class="form-control pb_height-50 reverse", placeholder="Equipments", value=venue.equipment) }}
-                </div>
 
-              
-             
-                <!-- <div class="row">
-                  <span class="txt1">
-                      Add Image
-                  </span>
+              <div class="row">
+                <div class="venueform-wrap-2">
+                  {{ form.equipment(class="form-control pb_height-50 reverse" , placeholder="Equipments", value=venue.equipment ) }}
                 </div>
-
-                <div class="row">
-                  <form action="/venue/add">
-                    <input type="file" class="form-control pb_height-50 reverse" name="pic" accept="image/*">
-                  </form>
-                </div>
- -->
+              </div>
+            
+             <div class="row">
+             <div class="venueform-wrap-2">
+              <img src="{{ url_for('static', filename='images/upload/'+ venue.image_file )}}" style="max-width: 150px; border-radius: 20px">
+                  {{ form.image_file.label() }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo", value=venue.image_file) }}
+                        {% if form.image_file.errors %}
+                          {% for error in form.image_file.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+              </div>
+              </div>
               <div class="container-login100-form-btn">
-                {{ form.submit(class="login100-form-btn", value="Edit Venue")}}
+                {{ form.submit(class="login100-form-btn", style="width: 62%;", value="Edit Venue")}}
               </div>
-            </form>          
-          </div>
+            </form>          </div>
+             <a href="/venue/manage"><img src="{{ url_for('static', filename='images/back.png') }}" width="100px" style="margin-bottom: -583px; margin-left: -50px"></a>
         </div>
       </div>  
     </section>

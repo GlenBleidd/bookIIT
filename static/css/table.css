@@ -7,9 +7,10 @@
 #display td, #display th {
     border: 1px solid #ddd;
     padding: 8px;
+    color: white;
 }
 
-#display tr:nth-child(even){background-color: #44ffee;}
+#display tr:nth-child(even){background-color: #3c0811;}
 
 #display tr:hover {background-color: #2ca69b;}
 
@@ -17,7 +18,7 @@
     padding-top: 12px;
     padding-bottom: 12px;
     text-align: left;
-    background-color: #007bff;
+    background-color: #3c0811;
     color: white;
 }
 

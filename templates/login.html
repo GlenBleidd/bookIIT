@@ -33,7 +33,8 @@
           <img src="{{ url_for('static', filename='images/img-01.png') }}" alt="IMG">
         </div>
 
-        <form class="login100-form-2 validate-form" action="/login" method="POST">
+
+      <form class="login100-form-2 validate-form" action="/login" method="POST">
             {{ form.csrf_token }}
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
@@ -49,7 +50,7 @@
           </span>
 
           <div class="wrap-input100-2 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-            {{ form.email(class="input100", placeholder="Email Address") }}            
+            {{ form.email(class="input100", placeholder="Email Address") }}
             <span class="focus-input100"></span>
             <span class="symbol-input100">
               <i class="fa fa-envelope" aria-hidden="true"></i>
@@ -86,7 +87,6 @@
       </div>
     </div>
 
-      
     </section>
 
   <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>

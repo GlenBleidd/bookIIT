@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Event Calendar</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/eventstyle.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/lato.css') }}">
+    
+    <style> 
+    {% for disp in disps %}
+    #{{disp.month}} {background-color: {{disp.color}};}
+    {% endfor %}
+    </style>
+
+
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark probootstrap-navabr-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/landing"><img src="{{ url_for('static', filename='images/logo.png') }}" width="150" height="75"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#probootstrap-nav" aria-controls="probootstrap-nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+          {%  if current_user.is_authenticated%}
+        <div class="collapse navbar-collapse" id="probootstrap-nav">
+          <ul class="navbar-nav ml-auto">
+            <div class="dropdown">
+              <div class="dropdown">
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
+                <div class="dropdown-content">
+                <a href="/profile">Profile</a>
+                <a href="/logout">Log Out</a>
+              </div>
+            </div>
+
+          </ul>
+              Logged in as {{current_user.fname}}
+        </div>
+          {% elif current_user.is_anonymous %}
+            <a href="/register" class="btn btn-info" style="margin-left: auto; ">Create Account</a>
+          {% endif %}
+          
+      </div>
+    </nav>
+
+    <section class="probootstrap-section">
+
+      <!-- <search action="/search" method="POST">
+        <div class="row">
+
+      </div>
+    </search> -->
+
+    <form method="POST">
+      <div class="container h-100">
+        <div class="d-flex justify-content-center h-100">
+          
+              {{search.csrf_token}}
+              <div class="searchbar">
+                {{ search.select(class="search_input") }}
+                {{search.searchfor(class="search_input",style="padding: 0 10px; width: 300px; caret-color: red; transition: width 0.4s linear;", placeholder="Search...")}}
+                <a>{{search.submit(class="search_icon", style="background-image: url(../static/images/loupe.png); background-position:center; background-size: 24px; background-repeat: no-repeat;")}}</a>
+              </div>
+          
+        </div>
+      </div>
+    </form>
+
+      <div class="container" style="padding-top: 50px;">
+        <div class="row">
+            {% for disp in disps %}
+            <button class="tablink w3-animate-opacity" onclick="openPage('{{ disp.month }}', this, '{{ disp.color }}88')">{{ disp.month }}</button>
+            {% endfor %}
+            {% for disp in disps %}
+            <div id="{{ disp.month }}" class="tabcontent" >
+              {% for event in events|sort(attribute='date_s') %}
+              {% if event.status == 'Approved' and disp.id == event.date_s.strftime("%B") %}
+              <ul class="event-list">
+                <li>
+                    <time datetime="2014-07-20">
+                        {% if event.date_e == event.date_s %}
+                            <span class="day" style="padding-bottom: 15px;">{{ event.date_s.strftime("%d") }}</span>
+                        {% elif event.date_e > event.date_s %}
+                            <span class="days" >{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
+                        {% endif %}
+                        <span class="month">{{ event.start.strftime("%H:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
+                    </time>
+                    <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}">
+                    <div class="info">
+                        <h2 class="title">{{ event.title }}</h2>
+                        {% for user in users %}
+                        {% if user.id == event.organizer %}
+                        <p class="desc">by: {{ user.fname + ' ' + user.lname }}</p>
+                        {%endif%}{%endfor%}
+                        <p class="desc">{{ event.description| truncate(100, False) | safe }}</p>
+                        <ul>
+                            {%  if current_user.is_authenticated%}
+                            {% if event.organizer == current_user.id or current_user.is_admin() %}
+                            <li style="width:33 %;" data-toggle="modal" data-target="#view{{ event.id }}"><img src="{{ url_for('static', filename='images/list.png') }}">View Participants </li>
+                            <li style="width:33%;" data-toggle="modal" data-target="#participate{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </li>
+                            {% elif event.organizer != current_user.id or current_user.is_anonymous() %}
+                            <li style="width:50%;" data-toggle="modal" data-target="#participate{{ event.id }}"><img src="{{ url_for('static', filename='images/note.png') }}">Join Event </li>
+                            {% endif %}
+                                {% endif %}
+                            <li style="width:40%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
+                        </ul>
+                    </div>
+                  </li>
+                </ul>
+            {% endif %}
+            {% endfor %}
+            </div>
+            {% endfor %}
+            <!-- <div class="row">
+              <img src="{{ url_for('static', filename='images/nothing.png') }}" style="width: 50%; margin: auto; border-radius: 1rem;">    
+            </div> -->
+        </div>
+      </div>
+    </section>
+
+{% for event in events %}
+{% for venue in venues %}
+    <!--- LOG IN !--->
+<div id="event{{ event.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog" style="max-width: 75%;">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="product-title">{{ event.title }}</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      
+              
+    <div class="card">
+      <div class="container-fliud">
+        <div class="wrapper row">
+          <div class="preview col-md-6">
+            
+            <div class="preview-pic tab-content">
+              <div class="tab-pane active" id="pic-1"><img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" /></div>
+            </div>
+          </div>
+          <div class="details col-md-6">
+            <h3 class="product-title">Details</h3><!-- 
+            {% for user in users %}
+            <span class="review-no">by {{ user.fname +' '+ user.lname }}</span>
+            {% endfor %} -->
+            <div class="rating">
+              {% if event.date_e is none %}
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d, %Y")  }}</span>  
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              {% elif event.date_e is not none %}
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d") }} - {{ event.date_e.strftime("%d, %Y") }} </span>
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              {% endif %}
+            </div>
+            <span class="review-no"><img src="{{ url_for('static', filename='images/pin.png') }}">{{ venue.name }}</span>
+            <p class="product-description">{{ event.description }}</p>
+            <h4 class="price">Tags</h4>
+            <p class="vote"><strong>{{ event.tags }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+<div id="view{{ event.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog" style="max-width: 50%;">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="product-title">{{ event.title }} - Participants</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      
+              
+    <div class="card">
+      <div class="container-fliud">
+        <div class="wrapper row">
+        <br>  
+          <div class="table-responsive">
+              <table id="mytable" class="table table-bordred table-striped">
+               <thead>
+                 <th>First Name</th>
+                 <th>Last Name</th>
+                 <th>Email</th>
+                 <th>Contact</th>
+                 <th>Delete</th>
+               </thead>
+                <tbody>
+                  {% for p in participants %}
+                  {% if p.event == event.id %}
+                  <tr>
+                    <td>{{p.fname}}</td>
+                    <td>{{p.lname}}</td>
+                    <td>{{p.email}}</td>
+                    <td>{{p.contact}}</td>
+                    <td><button action="/deleteparticipant/{{p.id}}" onclick="return confirm('Are you sure you want to delete this item?');"><img src="{{ url_for('static', filename='images/deleteuser.png') }}"></button></td>
+                  </tr> 
+                  {% endif %}
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<div id="participate{{ event.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog" style="max-width: 75%;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="product-title">{{ event.title }}</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+
+      <div class="wrap-login100-2">
+
+        <form class="login100-form validate-form" action="/event" method="POST">
+            {{ form.csrf_token }}
+            <p hidden="">{{ form.eventid(value=event.id)}}</p>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class=flashes>
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+          
+          <div class="row" style="margin-top: 30px;">
+            <div class="wrap-input100 validate-input" data-validate = "Please enter First Name">
+              {{ form.fname.label(class="form-control-label") }}
+              {{ form.fname(class="input100", value=current_user.fname) }}
+            </div>
+          
+            <div class="wrap-input100 validate-input" data-validate = "Please enter Last Name">
+              {{ form.lname.label(class="form-control-label") }}
+              {{ form.lname(class="input100", value=current_user.lname) }}
+            </div>
+          </div>
+          
+          <div class="row">
+            <div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+              {{ form.email.label(class="form-control-label") }}
+              {{ form.email(class="input100", value=current_user.email) }}
+            </div>
+
+            <div class="wrap-input100 validate-input" data-validate = "Please provide a Contact Number">
+              {{ form.contact.label(class="form-control-label") }}
+              {{ form.contact(class="input100", value=current_user.contact) }}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="wrap-input100">
+              <br>
+                <input type="submit" class="login100-form-btn" value="Join Event">
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endfor %}
+{% endfor %}
+
+
+
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-1.11.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/event.js') }}"></script>
+  </body>
+</html>
+
+

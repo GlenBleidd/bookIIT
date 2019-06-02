@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Venue-Add</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formsmain.css') }}">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark probootstrap-navabr-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/landing"><img src="{{ url_for('static', filename='images/logo.png') }}" width="150" height="75"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#probootstrap-nav" aria-controls="probootstrap-nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="probootstra-nav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a href="/event" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
+            <div class="dropdown">
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
+                <div class="dropdown-content">
+                <a href="/profile">Profile</a>
+                <a href="/logout">Log Out</a>
+              </div>
+            </div>
+          </ul>
+            Logged in as {{current_user.fname}}
+        </div>
+      </div>
+    </nav>
+
+    <section class="probootstrap-cover">
+      <div class="limiter">
+        <div class="container-login100-2">
+          <div class="wrap-venue100" style="margin-top: 60px; margin-bottom: 60px;">
+
+            <form class="login100-form validate-form" method="post" action="/addevent" enctype="multipart/form-data">
+              {{ form.csrf_token }}
+              {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  <ul class=flashes>
+                  {% for message in messages %}
+                    <li>{{ message }}</li>
+                  {% endfor %}
+                  </ul>
+                {% endif %}
+              {% endwith %}
+      
+              <div class="form-header">
+                <h2>Event Booking</h2>
+              </div>
+
+              <div class="row">
+                <div class="venueform-wrap">
+                  <span class="form-label">Event Title</span>
+                  {{ form.title(class="form-control", type="tel", placeholder="Title" ) }}
+                </div>
+                
+                <div class="venueform-wrap">
+                  <span class="form-label">Event Description</span>
+                  {{ form.description(class="form-control", type="tel", placeholder="Description" ) }}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="venueform-wrap">
+                  <span class="form-label">Event Venue</span>
+                  {{ form.venue(class="form-control", type="tel", placeholder="Venue" ) }}
+                </div>
+              
+                <div class="venueform-wrap">
+                  <span class="form-label">Event Tags</span>
+                  {{ form.tags(class="form-control", type="tel", placeholder="Tags" ) }}
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="venueform-wrap">
+                  {{ form.image_file.label() }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo") }}
+                  {% if form.image_file.errors %}
+                    {% for error in form.image_file.errors %}
+                      <span class="text-danger">{{ error }}</span>
+                    {% endfor %}
+                  {% endif %}     
+                </div>
+
+                <div class="venueform-wrap">
+                  <span class="form-label">Number of Participants</span>
+                  {{ form.partnum(class="form-control", type="tel", placeholder="Number of Participants" ) }}
+                </div>
+              </div>  
+
+              <div class="row">
+                <div class="venueform-wrap">
+                  <span class="form-label">Start Date</span>
+                  {{ form.date_s(class="form-control", type="date", placeholder="Start Date") }}
+                </div>
+
+                <div class="venueform-wrap">
+                  <span class="form-label">End Date (Optional)</span>
+                  {{ form.date_e(class="form-control", type="date", placeholder="End Date") }}
+                </div>
+              </div>
+              
+              <div class="row">
+                <div class="venueform-wrap">
+                  <span class="form-label">Starts From</span>
+                  {{ form.start(class="form-control", type="time", placeholder="Start Time") }}
+                </div>
+
+                <div class="venueform-wrap">
+                  <span class="form-label">Until</span>
+                  {{ form.end(class="form-control", type="time", placeholder="End Time" ) }}       
+                </div>
+              </div>
+
+              <div class="container-login100-form-btn">
+                {{ form.submit(class="login100-form-btn")}}
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>  
+    </section>
+
+    <script>
+      $('.form-control').each(function () {
+        floatedLabel($(this));
+      });
+
+      $('.form-control').on('input', function () {
+        floatedLabel($(this));
+      });
+
+      function floatedLabel(input) {
+        var $field = input.closest('.form-group');
+        if (input.val()) {
+          $field.addClass('input-not-empty');
+        } else {
+          $field.removeClass('input-not-empty');
+        }
+      }
+    </script>
+
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+
+</html>

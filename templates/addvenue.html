@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Landing</title>
+    <title>Venue-Add</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
     <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
@@ -25,15 +26,14 @@
           <ul class="navbar-nav ml-auto">
             <li class="nav-item"><a href="" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
             <div class="dropdown">
-                <button class="dropbtn"><img src="{{ url_for('static', filename='images/user.png') }}"></button>
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
                 <div class="dropdown-content">
-                <a href="#">Profile</a>
-                <a href="#">Preferences</a>
+                <a href="/profile">Profile</a>
                 <a href="/logout">Log Out</a>
               </div>
             </div>
           </ul>
-            Logged in as {{current_user.username}}
+            Logged in as {{current_user.fname}}
         </div>
       </div>
     </nav>
@@ -41,9 +41,9 @@
     <section class="probootstrap-cover">
       <div class="limiter">
         <div class="container-login100-2">
-          <div class="wrap-venue100">
+          <div class="wrap-venue100" style="margin-top: 60px; margin-bottom: 60px;">
 
-            <form class="login100-form validate-form" action="/addvenue" method="POST">
+            <form class="login100-form validate-form" action="/addvenue" method="POST" enctype="multipart/form-data">
                 {{ form.csrf_token }}
                 {% with messages = get_flashed_messages() %}
                     {% if messages %}
@@ -54,7 +54,7 @@
                         </ul>
                     {% endif %}
                 {% endwith %}
-              <span class="login100-form-title-2">
+              <span class="login100-form-title-2" style="padding-bottom: 10px;">
                 Add Venue
               </span>
 
@@ -88,42 +88,38 @@
                   {{ form.rate(class="form-control pb_height-50 reverse", placeholder="Rate (Php/hr)" ) }}
                 </div>
               </div>
+
               
               <div class="row">
                 <span class="venue-txt">
-                  If others, please specify:
+                  Equipments:
                 </span>
-
-                <span class="venue-txt2">
-                Equipments:
-              </span>
               </div>
 
-
+              <div class="row">
+                <div class="venueform-wrap-2">
+                  {{ form.equipment(class="form-control pb_height-50 reverse" , placeholder="Equipments" ) }}
+                </div>
+              </div>
+            
+             <div class="row">
+             <div class="venueform-wrap-2">
+                  {{ form.image_file.label() }}
+                  {{ form.image_file(class="form-control pb_height-50 reverse", placeholder="Add Photo") }}
+                        {% if form.image_file.errors %}
+                          {% for error in form.image_file.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                          {% endfor %}
+                        {% endif %}
+              </div>
+              </div>
                 
-                <div class="venueform-wrap">
-                  {{ form.equipment(class="form-control pb_height-50 reverse", placeholder="Equipments" ) }}
-                </div>
-              </div>
-              
-             
-                <!-- <div class="row">
-                  <span class="txt1">
-                      Add Image
-                  </span>
-                </div>
-
-                <div class="row">
-                  <form action="/venue/add">
-                    <input type="file" class="form-control pb_height-50 reverse" name="pic" accept="image/*">
-                  </form>
-                </div>
- -->
               <div class="container-login100-form-btn">
-                {{ form.submit(class="login100-form-btn")}}
+                {{ form.submit(class="login100-form-btn", style="width: 62%;")}}
               </div>
             </form>          
           </div>
+          <a href="/venue/manage"><img src="{{ url_for('static', filename='images/back.png') }}" width="100px" style="margin-bottom: -500px; margin-left: -50px"></a>
         </div>
       </div>  
     </section>

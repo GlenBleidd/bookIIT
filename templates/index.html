@@ -5,10 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
-    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+      <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
+      <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/formsmain.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
   </head>
   <body>
@@ -22,7 +23,7 @@
 
         <div class="collapse navbar-collapse" id="probootstrap-nav">
           <ul class="navbar-nav ml-auto">
-            <li class="nav-item"><a href="/landing" class="nav-link"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
+            <li class="nav-item"><a href="/event" class="nav-link"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
           </ul>
         </div>
       </div>
@@ -36,20 +37,18 @@
             <div class="probootstrap-text">
               {% with messages = get_flashed_messages() %}
                 {% if messages %}
-                    <ul class=flashes>
+                    <ul class="alert" style="color: #fff; background-color: #3c3b3bb3;" role="alert">
                         {% for message in messages %}
                             <li>{{ message }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
-            {% endwith %}
+              {% endwith %}
               <h1 class="probootstrap-heading text-white mb-4">
-              </h1><img src="{{ url_for('static', filename='images/homelogo.png') }}" alt="Home"</a></h1>
+              </h1><img src="{{ url_for('static', filename='images/homelogo.png') }}" alt="Home"></h1>
                 <p>
-                  <a href="/login" class="btn btn-primary mr-2 mb-2">Log In</a>
+                  <a class="btn btn-primary mr-2 mb-2" data-toggle="modal" data-target="#modLogin" style="color: #ffffff;">Log In</a>
                   <a href="/register" class="btn btn-primary mr-2 mb-2">Sign Up</a>
-                  <!-- <a class="btn btn-primary mr-2 mb-2" data-toggle="modal" data-target="#modLogin">Log In</a> -->
-				          <!-- <a class="btn btn-primary mr-2 mb-2" data-toggle="modal" data-target="#modSignup" >Sign Up</a> -->
                 </p>
             </div>
           </div>
@@ -59,7 +58,7 @@
 
 
 <!--- LOG IN !--->
- <div id="modLogin" class="modal fade" role="dialog">
+<div id="modLogin" class="modal fade" role="dialog">
   <div class="modal-dialog">
 
     <!-- Modal content -->
@@ -68,68 +67,55 @@
         <button type="button" class="close" data-dismiss="modal">&times;</button>
       </div>
       <div class="modal-body">
-        <form action="#" class="bg-white rounded pb_form_v1">
-              <h2 class="mb-4 mt-0 text-center">Log In</h2>
-              <div class="form-group">
-                <input type="text" class="form-control pb_height-50 reverse" placeholder="Username/Email" name=user_id required>
-              </div>
-              <div class="form-group">
-                <input type="password" class="form-control pb_height-50 reverse" placeholder="Password" name="psw" required>
-              </div>
-              <div class="form-group">
-                <input type="submit" class="btn btn-primary btn-lg btn-block pb_btn-pill  btn-shadow-blue" value="Log In">
-              </div>
-            </form>
+              <form class="login100-form-main validate-form" action="/login" method="POST">
+            {{ form.csrf_token }}
+          <span class="login100-form-title">
+            Member Login
+          </span>
+
+          <div class="wrap-input100-2 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
+            {{ form.email(class="input100", placeholder="Email Address") }}
+            <span class="focus-input100"></span>
+            <span class="symbol-input100">
+              <i class="fa fa-envelope" aria-hidden="true"></i>
+            </span>
+          </div>
+
+          <div class="wrap-input100-2 validate-input" data-validate = "Password is required">
+            {{ form.password(class="input100", placeholder="Password") }}
+            <span class="focus-input100"></span>
+            <span class="symbol-input100">
+              <i class="fa fa-lock" aria-hidden="true"></i>
+            </span>
+          </div>
+
+            <input type="submit" class="login100-form-btn" value="Login">
+
+          <div class="text-center p-t-12">
+            <span class="txt1">
+              Forgot
+            </span>
+            <a class="txt2" href="#">
+              Username / Password?
+            </a>
+          </div>
+
+          <div class="text-center p-t-136">
+            <a class="txt2" href="/register">
+              Create your Account
+              <i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+            </a>
+          </div>
+        </form>
       </div>
     </div>
-
   </div>
 </div>
-
-
-<!--- SIGN UP !--->
-<!-- <div id="modSignup" class="modal fade" role="dialog">
-  <div class="modal-dialog"> -->
-
-    <!-- Modal content-->
-   <!--  <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-      </div>
-      <div class="modal-body">
-        <form action="#" class="bg-white rounded pb_form_v1">
-              <h2 class="mb-4 mt-0 text-center">Sign Up for Free</h2>
-              <div class="form-group">
-                <input type="text" class="form-control pb_height-50 reverse" placeholder="First Name" name="fname" required>
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control pb_height-50 reverse" placeholder="Last Name" name="lname" required>
-              </div>
-              <div class="form-group">
-                <input type="text" class="form-control pb_height-50 reverse" placeholder="Username" name="lname" required>
-              </div>
-              <div class="form-group">
-                <input type="email" class="form-control pb_height-50 reverse" placeholder="Email" name="mail" required>
-              </div> 
-              <div class="form-group">
-                <input type="password" class="form-control pb_height-50 reverse" placeholder="Password" name="psw" required>
-              </div>
-              <div class="form-group">
-                <input type="password" class="form-control pb_height-50 reverse" placeholder="Retype Password" name="psw" required>
-              </div>
-              <div class="form-group">
-                <input type="submit" class="btn btn-primary btn-lg btn-block pb_btn-pill  btn-shadow-blue" value="Sign Up">
-              </div>
-            </form>
-      </div>
-    </div>
-  </div>
-</div> -->
-
 
     <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/formsmain.js') }}"></script>
   </body>
 </html>

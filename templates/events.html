@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Manage Events</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formsmain.css') }}">    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/eventstyle.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/table.css') }}">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark probootstrap-navabr-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/landing"><img src="{{ url_for('static', filename='images/logo.png') }}" width="150" height="75"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#probootstrap-nav" aria-controls="probootstrap-nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="probootstrap-nav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a href="/event" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
+            <div class="dropdown">
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
+                <div class="dropdown-content">
+                <a href="/profile">Profile</a>
+                <a href="/logout">Log Out</a>
+              </div>
+            </div>
+          </ul>
+            Logged in as {{current_user.fname}}
+        </div>
+      </div>
+    </nav>
+
+    <section class="probootstrap-section">
+      <div class="container">
+        <div class="row">
+            {% for event in events|sort(attribute='date_s') %}
+            {% if event.status == 'Pending' and events|selectattr('status','equalto','Pending')|list|length != 0 %}
+            <ul class="event-list">
+                <li>
+                     <time datetime="2014-07-20">
+                        {% if event.date_e == event.date_s %}
+                            <span class="day" style="padding-bottom: 15px;">{{ event.date_s.strftime("%d") }}</span>
+                        {% elif event.date_e > event.date_s %}
+                            <span class="days" >{{ event.date_s.strftime("%d") }} - {{ event.date_e.strftime("%d") }}</span>
+                        {% endif %}
+                        <span class="month">{{ event.start.strftime("%H:%M") }} - {{ event.end.strftime("%H:%M") }}</span>
+                    </time>
+                    <img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}">
+                    <div class="info">
+                        <div class="row" style="margin-left: 10px;">
+                            <h2 class="title">{{ event.title }}</h2>
+                            <p class="stat" style="margin-left: auto; margin-right: 65px;"> {{ event.status }} </p>
+                        </div>
+                        {% for user in users %}
+                        {% if user.id == event.organizer %}
+                        <p class="desc">Organizer: {{ user.fname + ' ' + user.lname }}</p>
+                        {%endif%}{%endfor%}
+                        <p class="desc">Date Requested: {{ event.requestdate }}</p>
+                        <ul>
+                            <li style="width:40%;" data-toggle="modal" data-target="#event{{ event.id }}"><img src="{{ url_for('static', filename='images/info.png') }}"> More Info </li>
+                        </ul>
+                    </div>
+                    <div class="social">
+                        <ul>
+                            <form action="/event/{{event.id}}/approved" method="post">
+                            <button class="approved"><img src="{{ url_for('static', filename='images/approved.png') }}" width="50" height="50"></button>
+                            </form>
+                            <button class="rejected" data-toggle="modal" data-target=#modEvent{{ event.id }}><img src="{{ url_for('static', filename='images/rejected.png') }}" width="50" height="50"></button>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            {% elif event.status == 'PH' and events|selectattr('status','equalto','Pending')|list|length == 0 %}
+            <ul class="event-list">
+                <img src="{{ url_for('static', filename='images/noreqbanner.png') }}" style="width: 100%; margin-top: 70px; border-radius: 1rem;">
+                <div class="row">
+                    <a type=button href="/landing" style="margin: auto;"><img src="{{ url_for('static', filename='images/back.png') }}" style="max-width: 100px; margin: auto; margin-top: 70px;"></a>
+                </div>
+            </ul>
+            {% endif %}
+            {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    {% for event in events %}
+    {% for venue in venues %}
+    <div id="event{{ event.id }}" class="modal fade" role="dialog">
+  <div class="modal-dialog" style="max-width: 75%;">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="product-title">{{ event.title }}</h3>
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+      </div>
+      
+              
+    <div class="card">
+      <div class="container-fliud">
+        <div class="wrapper row">
+          <div class="preview col-md-6">
+            
+            <div class="preview-pic tab-content">
+              <div class="tab-pane active" id="pic-1"><img src="{{ url_for('static', filename='images/upload/'+ event.image_file )}}" /></div>
+            </div>
+          </div>
+          <div class="details col-md-6">
+            <h3 class="product-title">Details</h3>
+            <div class="rating">
+              {% if event.date_e == event.date_s %}
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d, %Y")  }}</span>  
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              {% elif event.date_e > event.date_s %}
+              <span class="review-no"><img src="{{ url_for('static', filename='images/calendarmini.png') }}" style="padding-right: 5px">{{ event.date_s.strftime("%b %d") }} - {{ event.date_e.strftime("%d, %Y") }} </span>
+              <span class="review-no"><img src="{{ url_for('static', filename='images/clock.png') }}" style="padding-right: 5px">{{ event.start.strftime("%I:%M %p") }}-{{ event.end.strftime("%I:%M %p") }}</span>
+              {% endif %}
+            </div>
+            <span class="review-no"><img src="{{ url_for('static', filename='images/pin.png') }}">{{ venue.name }}</span>
+            <p class="product-description">{{ event.description }}</p>
+            <h4 class="price">Tags</h4>
+            <p class="vote"><strong>{{ event.tags }}</strong></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+   {% endfor %}
+    {% endfor %}
+
+
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>
+

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Venues</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ 
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/msulogo.png') }}"/>   
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/open-iconic-bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/sidebar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dispbox.css') }}">
+  </head>
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark probootstrap-navabr-dark">
+      <div class="container">
+        <a class="navbar-brand" href="/landing"><img src="{{ url_for('static', filename='images/logo.png') }}" width="150" height="75"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#probootstrap-nav" aria-controls="probootstrap-nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="probootstrap-nav">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item"><a href="/event" class="nav-link" data-toggle="tooltip" title="Event Calendar"><img src="{{ url_for('static', filename='images/calendar.png') }}"></a></li>
+            <div class="dropdown">
+                <button class="dropbtn" style="background-image: url(../static/images/upload/{{current_user.image_file}});"></button>
+                <div class="dropdown-content">
+                <a href="/profile">Profile</a>
+                <a href="/logout">Log Out</a>
+              </div>
+            </div>
+
+          </ul>
+            Logged in as {{current_user.fname}}
+        </div>
+      </div>
+    </nav>
+
+    <section class="probootstrap-section">
+      <div class="container">
+        <div>
+        <a href="/venue/manage"><img src="{{ url_for('static', filename='images/back.png') }}" style="width: 100px; margin-top: 15px;"></a>  
+        </div> 
+        <div class="row align-items-center" style="padding-top: 5px;">
+          <div class="col-md pl-md-3 pl-0 probootstrap-image-grid">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    <ul class="alert" style="color: #fff; background-color: #3c3b3bb3;" role="alert">
+                        {% for message in messages %}
+                            <li>{{ message }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+            <div class="row" style="padding-top: 20px;">
+
+              {% for college in colleges %}
+              {% if college.id != 0 %}
+              <div class="col-md-6">
+                <a class="probootstrap-img-item" href="/venue/{{college.id}}"><div style="background-image: url(../static/images/colleges/{{college.img}}); background-position: center;"></div></a>
+                <div class="texttest">
+                  <p>{{ college.abb }}</p>
+                </div>
+              </div>
+              {% endif %}
+              {% endfor %}
+            
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+
+    <!--- LOG IN !--->
+ <div id="MyModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content -->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">POPPOY</h4>
+      </div>
+      <div class="modal-body">
+              <p>POOPY POO</p>
+      </div>
+    </div>
+
+    
+
+    <script src="{{ url_for('static', filename='js/jquery-3.2.1.slim.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  </body>
+</html>

@@ -125,7 +125,7 @@ h1, h2, h3, h4, h5 {
   font-size: 14px;
   letter-spacing: .1em;
   text-transform: uppercase;
-  font-weight: bold;
+  /*font-weight: bold;*/
   cursor: pointer; }
   .btn:hover, .btn:active, .btn:focus {
     outline: none;
@@ -141,6 +141,31 @@ h1, h2, h3, h4, h5 {
     border-color: #fff;
     background: none; }
     .btn.btn-outline-white:hover, .btn.btn-outline-white:focus, .btn.btn-outline-white:active {
+      background: #fff;
+      color: #000; }
+
+.btn2 {
+  border-radius: 40px;
+  padding: 10px 20px;
+  font-size: 10px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer; }
+  .btn2:hover, .btn2:active, .btn2:focus {
+    outline: none;
+    -webkit-box-shadow: none;
+    box-shadow: none; }
+  .btn2.btn2-primary {
+    background: #033638;
+    border-color: #0F0003;
+    color: #fff; }
+    .btn2.btn2-primary:hover, .btn2.btn2-primary:focus, .btn2.btn2-primary:active {
+      background: #28a745; }
+  .btn2.btn2-outline-white {
+    border-color: #fff;
+    background: none; }
+    .btn2.btn2-outline-white:hover, .btn2.btn2-outline-white:focus, .btn2.btn2-outline-white:active {
       background: #fff;
       color: #000; }
 
@@ -309,3 +334,24 @@ h1, h2, h3, h4, h5 {
     color: #fff; }
   .probootstrap-section-feature p {
     color: rgba(255, 255, 255, 0.4); }
+
+  .card-img-top {
+    width: 100%;
+    height: 176.8px;
+    border-top-left-radius: calc(.25rem - 1px);
+    border-top-right-radius: calc(.25rem - 1px);
+  }
+
+  .card-text {
+    color: #000000;
+    font-size: 15px;
+  }
+
+  .modal-body2 {
+    color: #000000;
+  }
+
+  .modal-dialog {
+    max-width: 500px;
+    margin: 150px auto;
+  }

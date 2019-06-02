@@ -26,7 +26,7 @@
 
 * {
 	margin: 0px; 
-	padding: 0px; 
+	/*padding: 0px; */
 	box-sizing: border-box;
 }
 
@@ -268,6 +268,11 @@ iframe {
   width: 350px;
 }
 
+.login100-form-main {
+  width: 100%;
+  padding: 0px 50px;
+}
+
 
 .login100-form-title {
   font-family: Poppins-Bold;
@@ -302,7 +307,7 @@ iframe {
   z-index: 1;
   margin-bottom: 10px;
   margin-left: auto;
-  padding: 0px, 100px, 0px, 100px;
+  /*padding: 0px 100px 0px 100px;*/
 }
 
 .input100 {
@@ -317,6 +322,24 @@ iframe {
   height: 50px;
   border-radius: 25px;
   padding: 0 30px 0 30px;
+}
+
+
+.comment100 {
+  font-family: Poppins-Medium;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #666666;
+  display: block;
+  width: 100%;
+  background: #e6e6e6;
+  height: 150px;
+  border-radius: 2px;
+  padding: 0 5px 0 5px;
+}
+
+.comment100-form-main {
+  width: 100%;
 }
 
 
@@ -606,7 +629,7 @@ iframe {
   color: #333333;
   line-height: 1.2;
   text-align: left;
-
+  
   width: 100%;
   display: block;
   padding-bottom: 54px;
@@ -620,7 +643,7 @@ iframe {
 
   display: block;
   width: 100%;
-  background: #;
+  background: #fff;
   height: 50px;
   border-radius: 25px;
   padding: 0 30px 0 68px;
@@ -648,7 +671,16 @@ iframe {
   z-index: 1;
   margin-bottom: 10px;
   margin-left: auto;
-  padding: 0px, 100px, 0px, 100px;
+  /*padding: 0px 100px 0px 100px;*/
+}
+
+.venueform-wrap-2 {
+  position: relative;
+  width: 100%;
+  z-index: 1;
+  margin-bottom: 10px;
+  margin-left: 38px;
+  /*padding: 0px 100px 0px 100px;*/
 }
 
 .venue-txt {
